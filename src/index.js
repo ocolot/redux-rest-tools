@@ -6,10 +6,15 @@ export {
   createRestActions,
 } from './rest-actions'
 
-export restReducer, {
+export {
+  restReducer,
   handlerCreator,
+  getEntities,
+  getEntity,
+  getFetching,
 } from './rest-reducers'
 
-export watchRestRequests, {
+export {
+  watchRestRequests,
   watchRequest,
 } from './rest-sagas'

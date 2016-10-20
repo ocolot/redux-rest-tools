@@ -118,7 +118,7 @@ type RestOptionsType = {
   baseRoute: string,
 }
 
-export default function* watchRestRequests(restOptions: RestOptionsType) {
+export function* watchRestRequests(restOptions: RestOptionsType) {
   const { actions, idAttribute, baseRoute } = restOptions
   const schema = new Schema('entities', { idAttribute })
 

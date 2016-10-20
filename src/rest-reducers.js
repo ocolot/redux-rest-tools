@@ -125,7 +125,7 @@ export function handlerCreator(verb, requestActions, idAttribute) {
   return handler(requestTypes, idAttribute)
 }
 
-export default function restReducer(config: RestReducerConfig) {
+export function restReducer(config: RestReducerConfig) {
   const { actions, idAttribute, extraHandlers } = config
   if (!actions) { throw new Error('actions is required in restReducer config') }
 
