@@ -8,16 +8,26 @@ import { Schema } from 'normalizr'
 
 const restVerbs = ['find', 'findOne', 'create', 'update', 'delete']
 
-type RequestConfigType = { method: string, url: string, data: Object }
+type RequestConfigType = { method: string, route: string, data: Object }
 type WatchOptionsType = {
   actions: {
     request: 'function',
     success: 'function',
     fail: 'function',
   },
+  schema: {},
   requestConfig: RequestConfigType,
 }
-type ActionType = { type: string }
+type ActionType = {
+  type: string,
+  payload: {},
+  meta: ?{
+    onSuccess: ?() => {},
+    onSuccessAction: ?any,
+    onFail: ?() => {},
+    onFailAction: ?any,
+  },
+}
 
 function replaceUrlParams(route, action) {
   let url = route

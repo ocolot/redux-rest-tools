@@ -2,7 +2,7 @@
 import { handleActions } from 'redux-actions'
 import { fromJS, Map } from 'immutable'
 
-export const initialState = fromJS({
+const initialState = fromJS({
   entities: {},
   ui: {
     fetching: false,
