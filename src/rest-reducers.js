@@ -8,15 +8,22 @@ const initialState = fromJS({
     fetching: false,
     submitting: false,
     findingOne: {},
+    creating: false,
     updating: {},
     deleting: {},
   },
 })
 
-type RestReducerConfig = {
+type RestReducerConfigType = {
   idAttribute: string,
   actions: {},
   extraHandlers: {},
+}
+
+type RequestActionsType = {
+  request: Function,
+  success: Function,
+  fail: Function,
 }
 
 const verbHandlers = {
@@ -36,14 +43,15 @@ const verbHandlers = {
     }
   },
   findOne(requestTypes, idAttribute) {
+    // NOTE: add entity to entities
     return {
       [requestTypes.request]: (state, { payload: { idAttribute } }) =>
         state.setIn(['ui', 'findingOne', idAttribute], true),
-      [requestTypes.success]: (state, { payload: { entities, result } }) =>
+      [requestTypes.success]: (state, { payload: { entities, result: [idAttribute, ...rest] } }) =>
         state
-          .merge({ entities })
-          .set('result', list => list.push(result[0]))
-          .deleteIn(['ui', 'findingOne', result[0]]),
+          .setIn(['entities', idAttribute], entities[idAttribute])
+          .update('result', list => list.push(idAttribute))
+          .deleteIn(['ui', 'findingOne', idAttribute]),
       [requestTypes.fail]: (state, { payload: error }) =>
         state
           .setIn(['errors', 'findOne'], fromJS(error))
@@ -51,17 +59,22 @@ const verbHandlers = {
     }
   },
   create(requestTypes, idAttribute) {
+    // NOTE: add entity to entities
     return {
       [requestTypes.request]: (state) =>
-        state.setIn(['ui', 'submitting'], true),
-      [requestTypes.success]: (state, { payload: { entities, result } }) =>
         state
-          .setIn(['ui', 'submitting'], false)
-          .merge({ entities })
-          .set('result', list => list.push(result[0])),
+          .setIn(['ui', 'creating'], true)
+          .setIn(['ui', 'submitting'], true),
+      [requestTypes.success]: (state, { payload: { entities, result: [idAttribute, ...rest] } }) =>
+        state
+          .setIn(['entities', idAttribute], entities[idAttribute])
+          .update('result', list => list.push(idAttribute))
+          .setIn(['ui', 'creating'], false)
+          .setIn(['ui', 'submitting'], false),
       [requestTypes.fail]: (state, { payload: error }) =>
         state
           .setIn(['errors', 'create'], fromJS(error))
+          .setIn(['ui', 'creating'], false)
           .setIn(['ui', 'submitting'], false),
     }
   },
@@ -72,10 +85,10 @@ const verbHandlers = {
         state
           .setIn(['ui', 'updating', idAttribute], true)
           .setIn(['ui', 'submitting'], true),
-      [requestTypes.success]: (state, { payload: { entities, result } }) =>
+      [requestTypes.success]: (state, { payload: { entities, result: [idAttribute, ...rest] } }) =>
         state
-          .merge({ entities })
-          .deleteIn(['ui', 'updating', result[0]])
+          .setIn(['entities', idAttribute], entities[idAttribute])
+          .deleteIn(['ui', 'updating', idAttribute])
           .setIn(['ui', 'submitting'], false),
       [requestTypes.fail]: (state, { payload: error }) =>
         state
@@ -90,11 +103,11 @@ const verbHandlers = {
         state
           .setIn(['ui', 'deleting', idAttribute], true)
           .setIn(['ui', 'submitting'], true),
-      [requestTypes.success]: (state, { payload: { idAttribute, result } }) =>
+      [requestTypes.success]: (state, { payload: { idAttribute } }) =>
         state
           .delete(idAttribute)
-          .set('result', list => list.filter(entity => (entity !== result[0])))
-          .deleteIn(['ui', 'deleting', result[0]])
+          .update('result', list => list.filter(entity => (entity !== idAttribute)))
+          .deleteIn(['ui', 'deleting', idAttribute])
           .setIn(['ui', 'submitting'], false),
       [requestTypes.fail]: (state, { payload: error }) =>
         state
@@ -105,7 +118,7 @@ const verbHandlers = {
   },
 }
 
-export function handlerCreator(verb, requestActions, idAttribute) {
+export function handlerCreator(verb: string, requestActions: RequestActionsType, idAttribute: string) {
   const handler = verbHandlers[verb]
 
   if (!handler) { throw new Error(`${verb} handler not found`) }
@@ -125,7 +138,7 @@ export function handlerCreator(verb, requestActions, idAttribute) {
   return handler(requestTypes, idAttribute)
 }
 
-export function restReducer(config: RestReducerConfig) {
+export function restReducer(config: RestReducerConfigType) {
   const { actions, idAttribute, extraHandlers } = config
   if (!actions) { throw new Error('actions is required in restReducer config') }
 
