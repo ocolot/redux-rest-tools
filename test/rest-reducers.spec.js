@@ -19,12 +19,6 @@ describe('restReducer', () => {
       expect(getIdFromPayloadKey(action, 'name')).toBe('black')
     })
 
-    it('should return idAttribute from payload (idAttribute: function)', () => {
-      const action = { type: 'test', payload: { name: 'black' } }
-      const idAttribute = entity => entity.name
-      expect(getIdFromPayloadKey(action, idAttribute)).toBe('black')
-    })
-
     it('should throw if idAttribute not found', () => {
       const actions = [
         { type: 'test' },

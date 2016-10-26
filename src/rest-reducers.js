@@ -37,13 +37,11 @@ type ActionType = {
   },
 }
 
-type IdAttributeType = string|(entity: ?{}) => string
-
-export function getIdFromPayloadKey(action: ActionType, idAttribute: IdAttributeType) {
+export function getIdFromPayloadKey(action: ActionType, idAttribute: string) {
   const { payload } = action
   if (!payload) { throw new Error(`Action ${action.type} should include payload key`) }
 
-  const id = typeof idAttribute === 'function' ? idAttribute(payload) : payload[idAttribute]
+  const id = payload[idAttribute]
   if (!id) { throw new Error(`Payload of action ${action.type} should include idAttribute key`) }
   return id
 }
@@ -58,7 +56,7 @@ export function getIdFromNormalizedPayload(action: ActionType) {
   return id
 }
 
-export function getEntityFromAction(action: ActionType, idAttribute: IdAttributeType) {
+export function getEntityFromAction(action: ActionType) {
   const id = getIdFromNormalizedPayload(action)
 
   const entity = action.payload.entities && action.payload.entities[id]
@@ -91,7 +89,7 @@ const verbHandlers = {
         return state.setIn(['ui', 'findingOne', id], true)
       },
       [requestTypes.success]: (state, action) => {
-        const entity = getEntityFromAction(action, idAttribute)
+        const entity = getEntityFromAction(action)
         const id = getIdFromNormalizedPayload(action)
         return state
           .setIn(['entities', id], fromJS(entity))
@@ -111,7 +109,7 @@ const verbHandlers = {
         state
           .setIn(['ui', 'creating'], true),
       [requestTypes.success]: (state, action) => {
-        const entity = getEntityFromAction(action, idAttribute)
+        const entity = getEntityFromAction(action)
         const id = getIdFromNormalizedPayload(action)
         return state
           .setIn(['entities', id], fromJS(entity))
@@ -133,7 +131,7 @@ const verbHandlers = {
           .setIn(['ui', 'updating', id], true)
       },
       [requestTypes.success]: (state, action) => {
-        const entity = getEntityFromAction(action, idAttribute)
+        const entity = getEntityFromAction(action)
         const id = getIdFromNormalizedPayload(action)
         return state
           .setIn(['entities', id], fromJS(entity))
