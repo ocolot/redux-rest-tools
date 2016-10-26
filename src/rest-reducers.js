@@ -198,12 +198,21 @@ export function restReducer(config: RestReducerConfigType) {
 
 // helpers
 
-export function getEntities(reducerSubState: ?Map) {
+type GetEntitiesOptionsType = {
+  reverse: ?bool,
+}
+
+const getEntitiesOptionsDefault = {
+  reverse: false,
+}
+
+export function getEntities(reducerSubState: ?Map, options: GetEntitiesOptionsType = getEntitiesOptionsDefault) {
   const empty: [?{}] = []
   if (!reducerSubState) { return empty }
   const entities = reducerSubState.get('entities')
-  const result = reducerSubState.get('result')
+  let result = reducerSubState.get('result')
   if (!entities || !result) { return empty }
+  if (options.reverse) { result = result.reverse() }
   return result.toJS().map(id => entities.get(id).toJS())
 }
 

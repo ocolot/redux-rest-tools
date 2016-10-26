@@ -385,6 +385,11 @@ describe('restReducer', () => {
         const entities = getEntities(state)
         expect(entities).toEqual([white, red, black])
       })
+
+      it('should return entities array ordered by result (reverse)', () => {
+        const entities = getEntities(state, { reverse: true })
+        expect(entities).toEqual([black, red, white])
+      })
     })
 
     describe('getEntity', () => {
