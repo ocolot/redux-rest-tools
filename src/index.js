@@ -11,7 +11,7 @@ export {
   handlerCreator,
   getEntities,
   getEntity,
-  getFetching,
+  getStatus,
 } from './rest-reducers'
 
 export {

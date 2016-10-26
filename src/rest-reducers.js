@@ -4,9 +4,9 @@ import { fromJS, Map } from 'immutable'
 
 const initialState = fromJS({
   entities: {},
+  result: [],
   ui: {
-    fetching: false,
-    submitting: false,
+    finding: false,
     findingOne: {},
     creating: false,
     updating: {},
@@ -26,35 +26,60 @@ type RequestActionsType = {
   fail: Function,
 }
 
+
+export function getIdFromPayload(action, idAttribute) {
+  const id = action.payload && action.payload[idAttribute]
+  if (!id) { throw new Error(`Payload of action ${action.type} should include ${idAttribute} key`) }
+  return id
+}
+
+export function getEntityFromAction(action, idAttribute) {
+  const { payload } = action
+  if (!payload) { throw new Error(`Action ${action.type} should include payload key`) }
+
+  const id = payload.result && payload.result[0]
+  if (!id) { throw new Error(`Payload of action ${action.type} should include result key (array of \'${idAttribute}\' attributes)`) }
+
+  const entity = payload.entities && payload.entities[id]
+  if (!entity) { throw new Error(`Payload of action ${action.type} shoud include key ${id} in entities`)}
+
+  return entity
+}
+
 const verbHandlers = {
   find(requestTypes, idAttribute) {
     return {
       [requestTypes.request]: (state) =>
-        state.setIn(['ui', 'fetching'], true),
+        state.setIn(['ui', 'finding'], true),
       [requestTypes.success]: (state, { payload: { entities, result } }) =>
         state
           .set('entities', fromJS(entities))
-          .set('result', result)
-          .setIn(['ui', 'fetching'], false),
+          .set('result', fromJS(result))
+          .setIn(['ui', 'finding'], false),
       [requestTypes.fail]: (state, { payload: error }) =>
         state
-          .setIn(['errors', 'find'], fromJS(error))
-          .setIn(['ui', 'fetching'], false),
+          .setIn(['errors', 'find'], error)
+          .setIn(['ui', 'finding'], false),
     }
   },
   findOne(requestTypes, idAttribute) {
     // NOTE: add entity to entities
     return {
-      [requestTypes.request]: (state, { payload: { idAttribute } }) =>
-        state.setIn(['ui', 'findingOne', idAttribute], true),
-      [requestTypes.success]: (state, { payload: { entities, result: [idAttribute, ...rest] } }) =>
-        state
-          .setIn(['entities', idAttribute], entities[idAttribute])
-          .update('result', list => list.push(idAttribute))
-          .deleteIn(['ui', 'findingOne', idAttribute]),
+      [requestTypes.request]: (state, action) => {
+        const id = getIdFromPayload(action, idAttribute)
+        return state.setIn(['ui', 'findingOne', id], true)
+      },
+      [requestTypes.success]: (state, action) => {
+        const entity = getEntityFromAction(action, idAttribute)
+        const id = entity[idAttribute]
+        return state
+          .setIn(['entities', id], fromJS(entity))
+          .update('result', list => list.push(id))
+          .deleteIn(['ui', 'findingOne', id])
+      },
       [requestTypes.fail]: (state, { payload: error }) =>
         state
-          .setIn(['errors', 'findOne'], fromJS(error))
+          .setIn(['errors', 'findOne'], error)
           .setIn(['ui', 'findingOne'], Map()),
     }
   },
@@ -63,57 +88,60 @@ const verbHandlers = {
     return {
       [requestTypes.request]: (state) =>
         state
-          .setIn(['ui', 'creating'], true)
-          .setIn(['ui', 'submitting'], true),
-      [requestTypes.success]: (state, { payload: { entities, result: [idAttribute, ...rest] } }) =>
-        state
-          .setIn(['entities', idAttribute], entities[idAttribute])
-          .update('result', list => list.push(idAttribute))
+          .setIn(['ui', 'creating'], true),
+      [requestTypes.success]: (state, action) => {
+        const entity = getEntityFromAction(action, idAttribute)
+        const id = entity[idAttribute]
+        return state
+          .setIn(['entities', id], fromJS(entity))
+          .update('result', list => list.push(id))
           .setIn(['ui', 'creating'], false)
-          .setIn(['ui', 'submitting'], false),
+      },
       [requestTypes.fail]: (state, { payload: error }) =>
         state
-          .setIn(['errors', 'create'], fromJS(error))
-          .setIn(['ui', 'creating'], false)
-          .setIn(['ui', 'submitting'], false),
+          .setIn(['errors', 'create'], error)
+          .setIn(['ui', 'creating'], false),
     }
   },
   update(requestTypes, idAttribute) {
     // NOTE: idAttribute cannot change
     return {
-      [requestTypes.request]: (state, { payload: { idAttribute } }) =>
-        state
-          .setIn(['ui', 'updating', idAttribute], true)
-          .setIn(['ui', 'submitting'], true),
-      [requestTypes.success]: (state, { payload: { entities, result: [idAttribute, ...rest] } }) =>
-        state
-          .setIn(['entities', idAttribute], entities[idAttribute])
-          .deleteIn(['ui', 'updating', idAttribute])
-          .setIn(['ui', 'submitting'], false),
+      [requestTypes.request]: (state, action) => {
+        const id = getIdFromPayload(action, idAttribute)
+        return state
+          .setIn(['ui', 'updating', id], true)
+      },
+      [requestTypes.success]: (state, action) => {
+        const entity = getEntityFromAction(action, idAttribute)
+        const id = entity[idAttribute]
+        return state
+          .setIn(['entities', id], fromJS(entity))
+          .deleteIn(['ui', 'updating', id])
+      },
       [requestTypes.fail]: (state, { payload: error }) =>
         state
-          .setIn(['errors', 'update'], fromJS(error))
-          .setIn(['ui', 'updating'], Map())
-          .setIn(['ui', 'submitting'], false),
+          .setIn(['errors', 'update'], error)
+          .setIn(['ui', 'updating'], Map()),
     }
   },
   delete(requestTypes, idAttribute) {
     return {
-      [requestTypes.request]: (state, { payload: { idAttribute } }) =>
-        state
-          .setIn(['ui', 'deleting', idAttribute], true)
-          .setIn(['ui', 'submitting'], true),
-      [requestTypes.success]: (state, { payload: { idAttribute } }) =>
-        state
-          .delete(idAttribute)
-          .update('result', list => list.filter(entity => (entity !== idAttribute)))
-          .deleteIn(['ui', 'deleting', idAttribute])
-          .setIn(['ui', 'submitting'], false),
+      [requestTypes.request]: (state, action) => {
+        const id = getIdFromPayload(action, idAttribute)
+        return state
+          .setIn(['ui', 'deleting', id], true)
+      },
+      [requestTypes.success]: (state, action) => {
+        const id = getIdFromPayload(action, idAttribute)
+        return state
+          .deleteIn(['entities', id])
+          .update('result', list => list.filter(idAttr => (idAttr !== id)))
+          .deleteIn(['ui', 'deleting', id])
+      },
       [requestTypes.fail]: (state, { payload: error }) =>
         state
-          .setIn(['errors', 'delete'], fromJS(error))
-          .setIn(['ui', 'deleting'], Map())
-          .setIn(['ui', 'submitting'], false),
+          .setIn(['errors', 'delete'], error)
+          .setIn(['ui', 'deleting'], Map()),
     }
   },
 }
@@ -170,20 +198,32 @@ export function restReducer(config: RestReducerConfigType) {
 
 // helpers
 
-export function getEntities(state: {}, collection: string) {
-  return state[collection].get('entities').toArray().map(entity => entity.toJS())
+export function getEntities(reducerSubState: ?Map) {
+  const empty: [?{}] = []
+  if (!reducerSubState) { return empty }
+  const entities = reducerSubState.get('entities')
+  const result = reducerSubState.get('result')
+  if (!entities || !result) { return empty }
+  return result.toJS().map(id => entities.get(id).toJS())
 }
 
-export function getEntity(state: {}, collection: string, idAttribute: string) {
-  const entity = state[collection].getIn(['entities', idAttribute])
+export function getEntity(reducerSubState: ?Map, idAttribute: string) {
+  if (!reducerSubState) { return }
+  const entity = reducerSubState.getIn(['entities', idAttribute])
   return entity ? entity.toJS() : undefined
 }
 
-export function getFetching(state: {}, collection: string, idAttribute: ?string) {
-  if (idAttribute) {
-    return state[collection].getIn(['ui', 'findingOne', idAttribute])
+const statuses = initialState.get('ui').keySeq()
+
+export function getStatus(reducerSubState: ?Map, status: string, idAttribute: ?string) {
+  if (!reducerSubState) { return }
+  if (!statuses.includes(status)) {
+    const allowedStatus = statuses.join(', ')
+    throw new Error(`In getStatus, status should be one of ${allowedStatus}`)
   }
-  return state[collection].getIn(['ui', 'fetching'])
+  const path = ['ui', status]
+  if (idAttribute) { path.push(idAttribute) }
+  return reducerSubState.getIn(path)
 }
 
-export const helpers = { getEntities, getEntity, getFetching }
+export const helpers = { getEntities, getEntity, getStatus }
