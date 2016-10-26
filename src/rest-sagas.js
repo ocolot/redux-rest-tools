@@ -11,9 +11,9 @@ const restVerbs = ['find', 'findOne', 'create', 'update', 'delete']
 type RequestConfigType = { method: string, route: string, data: Object }
 type WatchOptionsType = {
   actions: {
-    request: 'function',
-    success: 'function',
-    fail: 'function',
+    request: () => {},
+    success: () => {},
+    fail: () => {},
   },
   schema: {},
   requestConfig: RequestConfigType,
@@ -28,6 +28,8 @@ type ActionType = {
     onFailAction: ?any,
   },
 }
+
+type IdAttributeType = string|(entity: ?{}) => string
 
 function replaceUrlParams(route, action) {
   let url = route
@@ -116,16 +118,19 @@ export function* watchRequest(options: WatchOptionsType): any {
 
 type RestOptionsType = {
   actions: ActionType,
-  idAttribute: string,
+  idAttribute: IdAttributeType, // NOTE: function call without parameters should return string (e.g. 'slug')
   baseRoute: string,
-  getIdAttribute: ?() => {}, //NOTE supplent idAttribute if provided
 }
 
 export function* watchRestRequests(restOptions: RestOptionsType): any {
-  const { actions, idAttribute, getIdAttribute, baseRoute } = restOptions
-  const schema = new Schema('entities', { idAttribute: getIdAttribute || idAttribute })
+  const { actions, idAttribute, baseRoute } = restOptions
+  if (!idAttribute || !['string', 'function'].includes(typeof idAttribute)) {
+    throw new Error('In watchRestRequests, idAttribute must be a string or a function')
+  }
+  const schema = new Schema('entities', { idAttribute })
 
   const verbs = Object.keys(actions)
+  const idAttributeString = typeof idAttribute === 'function' ? idAttribute() : idAttribute
   for (const verb of verbs) {
     if (!restVerbs.includes(verb)) {
       continue
@@ -134,18 +139,18 @@ export function* watchRestRequests(restOptions: RestOptionsType): any {
     let route = baseRoute
     switch (verb) {
       case 'findOne':
-        route += `/:${idAttribute}`
+        route += `/:${idAttributeString}`
         break
       case 'create':
         method = 'post'
         break
       case 'update':
         method = 'put'
-        route += `/:${idAttribute}`
+        route += `/:${idAttributeString}`
         break
       case 'delete':
         method = 'delete'
-        route += `/:${idAttribute}`
+        route += `/:${idAttributeString}`
         break
     }
     yield fork(watchRequest, {

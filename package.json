@@ -1,6 +1,6 @@
 {
   "name": "redux-rest-tools",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Redux tools to handle REST requests",
   "main": "lib/index.js",
   "scripts": {

@@ -15,7 +15,7 @@ const initialState = fromJS({
 })
 
 type RestReducerConfigType = {
-  idAttribute: string,
+  idAttribute: IdAttributeType,
   actions: {},
   extraHandlers: {},
 }
@@ -26,21 +26,42 @@ type RequestActionsType = {
   fail: Function,
 }
 
+type ActionType = {
+  type: string,
+  payload: {},
+  meta: ?{
+    onSuccess: ?() => {},
+    onSuccessAction: ?any,
+    onFail: ?() => {},
+    onFailAction: ?any,
+  },
+}
 
-export function getIdFromPayload(action, idAttribute) {
-  const id = action.payload && action.payload[idAttribute]
-  if (!id) { throw new Error(`Payload of action ${action.type} should include ${idAttribute} key`) }
+type IdAttributeType = string|(entity: ?{}) => string
+
+export function getIdFromPayloadKey(action: ActionType, idAttribute: IdAttributeType) {
+  const { payload } = action
+  if (!payload) { throw new Error(`Action ${action.type} should include payload key`) }
+
+  const id = typeof idAttribute === 'function' ? idAttribute(payload) : payload[idAttribute]
+  if (!id) { throw new Error(`Payload of action ${action.type} should include idAttribute key`) }
   return id
 }
 
-export function getEntityFromAction(action, idAttribute) {
+export function getIdFromNormalizedPayload(action: ActionType) {
   const { payload } = action
   if (!payload) { throw new Error(`Action ${action.type} should include payload key`) }
 
   const id = payload.result && payload.result[0]
-  if (!id) { throw new Error(`Payload of action ${action.type} should include result key (array of \'${idAttribute}\' attributes)`) }
+  if (!id) { throw new Error(`Payload of action ${action.type} should include result array (entities idAttributes)`) }
 
-  const entity = payload.entities && payload.entities[id]
+  return id
+}
+
+export function getEntityFromAction(action: ActionType, idAttribute: IdAttributeType) {
+  const id = getIdFromNormalizedPayload(action)
+
+  const entity = action.payload.entities && action.payload.entities[id]
   if (!entity) { throw new Error(`Payload of action ${action.type} shoud include key ${id} in entities`)}
 
   return entity
@@ -66,12 +87,12 @@ const verbHandlers = {
     // NOTE: add entity to entities
     return {
       [requestTypes.request]: (state, action) => {
-        const id = getIdFromPayload(action, idAttribute)
+        const id = getIdFromPayloadKey(action, idAttribute)
         return state.setIn(['ui', 'findingOne', id], true)
       },
       [requestTypes.success]: (state, action) => {
         const entity = getEntityFromAction(action, idAttribute)
-        const id = entity[idAttribute]
+        const id = getIdFromNormalizedPayload(action)
         return state
           .setIn(['entities', id], fromJS(entity))
           .update('result', list => list.push(id))
@@ -91,7 +112,7 @@ const verbHandlers = {
           .setIn(['ui', 'creating'], true),
       [requestTypes.success]: (state, action) => {
         const entity = getEntityFromAction(action, idAttribute)
-        const id = entity[idAttribute]
+        const id = getIdFromNormalizedPayload(action)
         return state
           .setIn(['entities', id], fromJS(entity))
           .update('result', list => list.push(id))
@@ -107,13 +128,13 @@ const verbHandlers = {
     // NOTE: idAttribute cannot change
     return {
       [requestTypes.request]: (state, action) => {
-        const id = getIdFromPayload(action, idAttribute)
+        const id = getIdFromPayloadKey(action, idAttribute)
         return state
           .setIn(['ui', 'updating', id], true)
       },
       [requestTypes.success]: (state, action) => {
         const entity = getEntityFromAction(action, idAttribute)
-        const id = entity[idAttribute]
+        const id = getIdFromNormalizedPayload(action)
         return state
           .setIn(['entities', id], fromJS(entity))
           .deleteIn(['ui', 'updating', id])
@@ -127,12 +148,12 @@ const verbHandlers = {
   delete(requestTypes, idAttribute) {
     return {
       [requestTypes.request]: (state, action) => {
-        const id = getIdFromPayload(action, idAttribute)
+        const id = getIdFromPayloadKey(action, idAttribute)
         return state
           .setIn(['ui', 'deleting', id], true)
       },
       [requestTypes.success]: (state, action) => {
-        const id = getIdFromPayload(action, idAttribute)
+        const id = getIdFromPayloadKey(action, idAttribute)
         return state
           .deleteIn(['entities', id])
           .update('result', list => list.filter(idAttr => (idAttr !== id)))

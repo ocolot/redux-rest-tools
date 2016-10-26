@@ -1,7 +1,7 @@
 import expect from 'expect'
 import { fromJS } from 'immutable'
 import { restReducer, createRestActions, getEntities, getEntity, getStatus } from '../src'
-import { getIdFromPayload, getEntityFromAction } from '../src/rest-reducers'
+import { getIdFromPayloadKey, getEntityFromAction } from '../src/rest-reducers'
 
 describe('restReducer', () => {
   const actions = createRestActions({
@@ -9,24 +9,29 @@ describe('restReducer', () => {
     verbs: ['find', 'findOne', 'create', 'update', 'delete'],
   })
   const reducer = restReducer({
-    idAttribute: 'name',
+    idAttribute: 'name', // TODO: test when function(entity) { return entity.name }
     actions,
   })
 
-  describe('getIdFromPayload', () => {
-    it('should return idAttribute from payload', () => {
+  describe('getIdFromPayloadKey', () => {
+    it('should return idAttribute from payload (idAttribute: string)', () => {
       const action = { payload: { name: 'black' } }
-      expect(getIdFromPayload(action, 'name')).toBe('black')
+      expect(getIdFromPayloadKey(action, 'name')).toBe('black')
+    })
+
+    it('should return idAttribute from payload (idAttribute: function)', () => {
+      const action = { type: 'test', payload: { name: 'black' } }
+      const idAttribute = entity => entity.name
+      expect(getIdFromPayloadKey(action, idAttribute)).toBe('black')
     })
 
     it('should throw if idAttribute not found', () => {
-
       const actions = [
         { type: 'test' },
         { type: 'test', payload: { type: 'grumpy' } },
       ]
       for (const action of actions) {
-        expect(getIdFromPayload.bind(this, action, 'name')).toThrow()
+        expect(getIdFromPayloadKey.bind(this, action, 'name')).toThrow()
       }
     })
   })
