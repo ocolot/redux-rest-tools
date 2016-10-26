@@ -36,7 +36,9 @@ function replaceUrlParams(route, action) {
   if (urlParams) {
     for (const urlParam of urlParams) {
       const key = urlParam.substring(1)
-      url = url.replace(urlParam, action.payload[key])
+      const value = action.payload[key]
+      if (!value) { throw new Error(`key ${key} missing in action ${action.type}`) }
+      url = url.replace(urlParam, value)
     }
   }
   return url
@@ -102,7 +104,7 @@ function* fetch(options: WatchOptionsType, action: ActionType) {
   }
 }
 
-export function* watchRequest(options: WatchOptionsType) {
+export function* watchRequest(options: WatchOptionsType): any {
   const { actions } = options
   if (!actions) { throw new Error('actions are required') }
   if (!actions.request || !actions.success || !actions.fail) {
@@ -116,11 +118,12 @@ type RestOptionsType = {
   actions: ActionType,
   idAttribute: string,
   baseRoute: string,
+  getIdAttribute: ?() => {}, //NOTE supplent idAttribute if provided
 }
 
-export function* watchRestRequests(restOptions: RestOptionsType) {
-  const { actions, idAttribute, baseRoute } = restOptions
-  const schema = new Schema('entities', { idAttribute })
+export function* watchRestRequests(restOptions: RestOptionsType): any {
+  const { actions, idAttribute, getIdAttribute, baseRoute } = restOptions
+  const schema = new Schema('entities', { idAttribute: getIdAttribute || idAttribute })
 
   const verbs = Object.keys(actions)
   for (const verb of verbs) {
