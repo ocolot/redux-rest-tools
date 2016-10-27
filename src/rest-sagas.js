@@ -15,6 +15,7 @@ type WatchOptionsType = {
     success: () => {},
     fail: () => {},
   },
+  idAttribute: IdAttributeType,
   schema: {},
   requestConfig: RequestConfigType,
 }
@@ -107,11 +108,12 @@ function* fetch(options: WatchOptionsType, action: ActionType) {
 }
 
 export function* watchRequest(options: WatchOptionsType): any {
-  const { actions } = options
+  const { actions, idAttribute } = options
   if (!actions) { throw new Error('actions are required') }
   if (!actions.request || !actions.success || !actions.fail) {
     throw new Error('request, success and fail actions are required')
   }
+  options.schema = new Schema('entities', { idAttribute })
   const { type } = actions.request()
   yield* takeLatest(type, fetch, options)
 }
@@ -127,7 +129,6 @@ export function* watchRestRequests(restOptions: RestOptionsType): any {
   if (!idAttribute || !['string', 'function'].includes(typeof idAttribute)) {
     throw new Error('In watchRestRequests, idAttribute must be a string or a function')
   }
-  const schema = new Schema('entities', { idAttribute })
 
   const verbs = Object.keys(actions)
   const idAttributeString = typeof idAttribute === 'function' ? idAttribute() : idAttribute
@@ -155,7 +156,6 @@ export function* watchRestRequests(restOptions: RestOptionsType): any {
     }
     yield fork(watchRequest, {
       actions: actions[verb],
-      schema,
       requestConfig: { method, route },
     })
   }
