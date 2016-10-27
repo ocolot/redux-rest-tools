@@ -157,6 +157,7 @@ export function* watchRestRequests(restOptions: RestOptionsType): any {
     yield fork(watchRequest, {
       actions: actions[verb],
       requestConfig: { method, route },
+      idAttribute,
     })
   }
 }
