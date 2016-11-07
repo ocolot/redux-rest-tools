@@ -2,9 +2,8 @@
 import { takeLatest } from 'redux-saga'
 import { put, call, fork } from 'redux-saga/effects'
 import axios from 'axios'
-import { arrayOf, normalize } from 'normalizr'
+import { Schema, arrayOf, normalize } from 'normalizr'
 import { camelizeKeys } from 'humps'
-import { Schema } from 'normalizr'
 
 const restVerbs = ['find', 'findOne', 'create', 'update', 'delete']
 

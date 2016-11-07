@@ -2,7 +2,7 @@
 import { handleActions } from 'redux-actions'
 import { fromJS, Map } from 'immutable'
 
-const initialState = fromJS({
+export const initialState = fromJS({
   entities: {},
   result: [],
   ui: {
@@ -202,13 +202,13 @@ export function restReducer(config: RestReducerConfigType) {
     Object.assign(handlers, extraHandlers)
   }
 
-  if (actions['clear']) {
-    const { type } = actions['clear']
+  if (actions.clear) {
+    const { type } = actions.clear()
     handlers[type] = () => initialState
   }
 
-  if (actions['clearErrors']) {
-    const { type } = actions['clearErrors']
+  if (actions.clearErrors) {
+    const { type } = actions.clearErrors()
     handlers[type] = state => state.delete('errors')
   }
 

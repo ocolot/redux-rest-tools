@@ -1,7 +1,7 @@
 import expect from 'expect'
 import { fromJS } from 'immutable'
 import { restReducer, createRestActions, getEntities, getEntity, getStatus } from '../src'
-import { getIdFromPayloadKey, getEntityFromAction } from '../src/rest-reducers'
+import { getIdFromPayloadKey, getEntityFromAction, initialState } from '../src/rest-reducers'
 
 describe('restReducer', () => {
   const actions = createRestActions({
@@ -369,6 +369,28 @@ describe('restReducer', () => {
     })
   })
 
+  describe('clear', () => {
+    it('should reset state to initialState', () => {
+      const black = { name: 'black', type: 'grumpy' }
+      let state = reducer(undefined, actions.find.success({
+        entities: { black },
+        result: ['black'],
+      }))
+      state = reducer(state, actions.clear())
+      expect(state.toJS()).toEqual(initialState.toJS())
+    })
+  })
+
+  describe('clearErrors', () => {
+    it('should clear errors', () => {
+      const init = fromJS({
+        errors: { damn: 'it' },
+      })
+
+      const state = reducer(init, actions.clearErrors())
+      expect(state.get('errors')).toBe(undefined)
+    })
+  })
   describe('helpers', () => {
     const black = { name: 'black', type: 'grumpy' }
     const white = { name: 'white', type: 'happy' }
