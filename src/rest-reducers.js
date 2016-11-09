@@ -93,7 +93,10 @@ const verbHandlers = {
         const id = getIdFromNormalizedPayload(action)
         return state
           .setIn(['entities', id], fromJS(entity))
-          .update('result', list => list.push(id))
+          .update('result', list => {
+            if (list.includes(id)) { return list }
+            return list.push(id) 
+          })
           .deleteIn(['ui', 'findingOne', id])
       },
       [requestTypes.fail]: (state, { payload: error }) =>

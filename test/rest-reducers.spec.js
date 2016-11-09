@@ -135,6 +135,13 @@ describe('restReducer', () => {
     describe('success', () => {
       let state = reducer(undefined, actions.findOne.request({ name: 'black' }))
       const entity = { name: 'black', type: 'grumpy' }
+      const findOneSuccessData = {
+        entities: {
+          white: { name: 'white', type: 'happy' },
+        },
+        result: ['white'],
+      }
+
       state = reducer(state, actions.findOne.success({
         entities: {
           black: entity,
@@ -155,15 +162,16 @@ describe('restReducer', () => {
       })
 
       it('should keep existing entities', () => {
-        state = reducer(state, actions.findOne.success({
-          entities: {
-            white: { name: 'white', type: 'happy' },
-          },
-          result: ['white'],
-        }))
+        state = reducer(state, actions.findOne.success(findOneSuccessData))
 
         expect(state.getIn(['entities', 'black']).toJS()).toEqual(entity)
         expect(state.get('result').includes('black')).toBe(true)
+      })
+
+      it('should add idAttribute once to result', () => {
+        let state = reducer(undefined, actions.findOne.success(findOneSuccessData))
+        state = reducer(state, actions.findOne.success(findOneSuccessData))
+        expect(state.get('result').count(r => r === 'white')).toBe(1)
       })
     })
 
