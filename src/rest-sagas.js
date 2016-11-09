@@ -51,8 +51,12 @@ function* fetchApi(options: WatchOptionsType, action: ActionType) {
   config.url = replaceUrlParams(route, action)
 
   if (!config.method) { throw new Error('method missing in watchRequest config') }
-  if (['post', 'put', 'patch'].includes(config.method.toLowerCase())) {
+  const method = config.method.toLowerCase()
+  if (['post', 'put', 'patch'].includes(method)) {
     config.data = action.payload
+  }
+  if (method === 'get') {
+    config.params = action.payload
   }
 
   let { data } = yield axios.request(config)
