@@ -33,7 +33,7 @@ type IdAttributeType = string|(entity: ?{}) => string
 
 function replaceUrlParams(route, action) {
   let url = route
-  const urlParams = url.match(/:[a-zA-Z]+\b/g)
+  const urlParams = url.match(/:[_a-zA-Z]+\b/g)
 
   if (urlParams) {
     for (const urlParam of urlParams) {
