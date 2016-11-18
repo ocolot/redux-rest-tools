@@ -95,7 +95,7 @@ const verbHandlers = {
           .setIn(['entities', id], fromJS(entity))
           .update('result', list => {
             if (list.includes(id)) { return list }
-            return list.push(id) 
+            return list.push(id)
           })
           .deleteIn(['ui', 'findingOne', id])
       },
@@ -154,7 +154,7 @@ const verbHandlers = {
           .setIn(['ui', 'deleting', id], true)
       },
       [requestTypes.success]: (state, action) => {
-        const id = getIdFromPayloadKey(action, idAttribute)
+        const id = getIdFromNormalizedPayload(action)
         return state
           .deleteIn(['entities', id])
           .update('result', list => list.filter(idAttr => (idAttr !== id)))

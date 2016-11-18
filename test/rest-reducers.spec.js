@@ -329,8 +329,15 @@ describe('restReducer', () => {
         },
         result: ['black'],
       }))
+      const normalizedDeleteSuccess = {
+        entities: {
+          black: { name: 'black' },
+        },
+        result: ['black'],
+      }
+
       state = reducer(state, actions.delete.request({ name: 'black' }))
-      state = reducer(state, actions.delete.success({ name: 'black' }))
+      state = reducer(state, actions.delete.success(normalizedDeleteSuccess))
 
       it('should set ui.deleting[idAttribute] to not exist', () => {
         expect(state.getIn(['ui', 'deleting', 'black'])).toNotExist()
@@ -353,7 +360,7 @@ describe('restReducer', () => {
           },
           result: ['white', 'black'],
         }))
-        state = reducer(state, actions.delete.success({ name: 'black' }))
+        state = reducer(state, actions.delete.success(normalizedDeleteSuccess))
 
         expect(state.getIn(['entities', 'black'])).toNotExist()
         expect(state.get('result').includes('black')).toBe(false)
