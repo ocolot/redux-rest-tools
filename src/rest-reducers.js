@@ -1,6 +1,6 @@
 // @flow
 import { handleActions } from 'redux-actions'
-import { fromJS, Map } from 'immutable'
+import { fromJS, Map, Iterable, List } from 'immutable'
 
 export const initialState = fromJS({
   entities: {},
@@ -65,6 +65,10 @@ export function getEntityFromAction(action: ActionType) {
   return entity
 }
 
+function makeImmutable(obj: any) {
+  return Iterable.isIterable(obj) ? obj : fromJS(obj)
+}
+
 const verbHandlers = {
   find(requestTypes, idAttribute) {
     return {
@@ -72,8 +76,8 @@ const verbHandlers = {
         state.setIn(['ui', 'finding'], true),
       [requestTypes.success]: (state, { payload: { entities, result } }) =>
         state
-          .set('entities', fromJS(entities))
-          .set('result', fromJS(result))
+          .set('entities', makeImmutable(entities))
+          .set('result', makeImmutable(result))
           .setIn(['ui', 'finding'], false),
       [requestTypes.fail]: (state, { payload: error }) =>
         state
@@ -92,7 +96,7 @@ const verbHandlers = {
         const entity = getEntityFromAction(action)
         const id = getIdFromNormalizedPayload(action)
         return state
-          .setIn(['entities', id], fromJS(entity))
+          .setIn(['entities', id], makeImmutable(entity))
           .update('result', list => {
             if (list.includes(id)) { return list }
             return list.push(id)
@@ -115,7 +119,7 @@ const verbHandlers = {
         const entity = getEntityFromAction(action)
         const id = getIdFromNormalizedPayload(action)
         return state
-          .setIn(['entities', id], fromJS(entity))
+          .setIn(['entities', id], makeImmutable(entity))
           .update('result', list => list.push(id))
           .setIn(['ui', 'creating'], false)
       },
@@ -137,7 +141,7 @@ const verbHandlers = {
         const entity = getEntityFromAction(action)
         const id = getIdFromNormalizedPayload(action)
         return state
-          .setIn(['entities', id], fromJS(entity))
+          .setIn(['entities', id], makeImmutable(entity))
           .deleteIn(['ui', 'updating', id])
       },
       [requestTypes.fail]: (state, { payload: error }) =>
@@ -222,26 +226,41 @@ export function restReducer(config: RestReducerConfigType) {
 
 type GetEntitiesOptionsType = {
   reverse: ?bool,
+  immutable: ?bool,
 }
 
 const getEntitiesOptionsDefault = {
   reverse: false,
+  immutable: true,
 }
 
-export function getEntities(reducerSubState: ?Map, options: GetEntitiesOptionsType = getEntitiesOptionsDefault) {
-  const empty: [?{}] = []
+export function getEntities(reducerSubState: ?Map, options: GetEntitiesOptionsType = {}) {
+  options = { ...getEntitiesOptionsDefault, ...options }
+  const { immutable } = options
+
+  const empty = immutable ? List() : []
   if (!reducerSubState) { return empty }
   const entities = reducerSubState.get('entities')
   let result = reducerSubState.get('result')
   if (!entities || !result) { return empty }
   if (options.reverse) { result = result.reverse() }
-  return result.toJS().map(id => entities.get(id).toJS())
+  result = result.map(id => entities.get(id))
+  return immutable ? result : result.toJS()
 }
 
-export function getEntity(reducerSubState: ?Map, idAttribute: string) {
+type GetEntityOptionsType = {
+  immutable: ?bool,
+}
+
+const getEntityOptionsDefault = {
+  immutable: true,
+}
+
+export function getEntity(reducerSubState: ?Map, idAttribute: string, options: GetEntityOptionsType = {}) {
+  options = { ...getEntityOptionsDefault, ...options }
   if (!reducerSubState) { return }
   const entity = reducerSubState.getIn(['entities', idAttribute])
-  return entity ? entity.toJS() : undefined
+  return entity ? (options.immutable ? entity : entity.toJS()) : undefined
 }
 
 const statuses = initialState.get('ui').keySeq()
