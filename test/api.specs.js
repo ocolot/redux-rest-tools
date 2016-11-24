@@ -1,0 +1,45 @@
+import expect from 'expect'
+import axios from 'axios'
+
+import api from '../src/api'
+import { black, cats } from './dummies'
+
+describe('api', () => {
+  it('should get data (response contains object)', done => {
+    const action = {
+      type: 'TEST_REQUEST',
+      payload: { id: 42 },
+    }
+    const requestConfig = { method: 'get', route: '/tests/:id' }
+    const response = { data: black }
+    const spy = expect
+      .spyOn(axios, 'request')
+      .andReturn(Promise.resolve(response))
+
+    api(requestConfig, action).then(data => {
+      expect(spy).toHaveBeenCalledWith({ method: 'get', url: '/tests/42', params: { id: 42 } })
+      expect(data).toEqual(black, 'should resolve promise with data')
+      spy.restore()
+      done()
+    })
+  })
+
+  it('should get data (response contains array of objects)', done => {
+    const action = {
+      type: 'TESTS_REQUEST',
+      payload: {},
+    }
+    const requestConfig = { method: 'get', route: '/tests' }
+    const response = { data: cats }
+    const spy = expect
+      .spyOn(axios, 'request')
+      .andReturn(Promise.resolve(response))
+
+    api(requestConfig, action).then(data => {
+      expect(spy).toHaveBeenCalledWith({ method: 'get', url: '/tests', params: {} })
+      expect(data).toEqual(cats, 'should resolve promise with data')
+      spy.restore()
+      done()
+    })
+  })
+})

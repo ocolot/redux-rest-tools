@@ -1,7 +1,9 @@
 import expect from 'expect'
 import { fromJS, List, Iterable } from 'immutable'
-import { restReducer, createRestActions, getEntities, getEntity, getStatus } from '../src'
-import { getIdFromPayloadKey, getEntityFromAction, initialState } from '../src/rest-reducers'
+
+import { createRestActions } from '../src/actions'
+import { restReducer, getIdFromPayloadKey, getEntityFromAction, initialState } from '../src/reducers'
+import { black } from './dummies'
 
 describe('restReducer', () => {
   const actions = createRestActions({
@@ -32,9 +34,8 @@ describe('restReducer', () => {
 
   describe('getEntityFromAction', () => {
     it('should return entity from action', () => {
-      const entity = { name: 'black', type: 'grumpy' }
-      const action = { payload: { entities: { [entity.name]: entity }, result: [entity.name] } }
-      expect(getEntityFromAction(action, 'name')).toEqual(entity)
+      const action = { payload: { entities: { [black.name]: black }, result: [black.name] } }
+      expect(getEntityFromAction(action, 'name')).toEqual(black)
     })
 
     it('should throw if action malformed', () => {
@@ -404,78 +405,6 @@ describe('restReducer', () => {
 
       const state = reducer(init, actions.clearErrors())
       expect(state.get('errors')).toBe(undefined)
-    })
-  })
-  describe('helpers', () => {
-    const black = { name: 'black', type: 'grumpy' }
-    const white = { name: 'white', type: 'happy' }
-    const red = { name: 'red', type: 'dizzy' }
-    let state = reducer(undefined, { type: 'test' })
-    state = reducer(state, actions.find.success({
-      entities: { black, white, red },
-      result: ['white', 'red', 'black'],
-    }))
-
-    describe('getEntities', () => {
-      describe('(immutable)', () => {
-        it('should return entities array ordered by result', () => {
-          const entities = getEntities(state)
-          expect(Iterable.isIterable(entities)).toBe(true)
-          expect(entities.equals(fromJS([white, red, black]))).toBe(true)
-        })
-
-        it('should return entities array ordered by result (reverse)', () => {
-          const entities = getEntities(state, { reverse: true })
-          expect(Iterable.isIterable(entities)).toBe(true)
-          expect(entities.equals(fromJS([black, red, white]))).toBe(true)
-        })
-      })
-
-      describe('(js)', () => {
-        it('should return entities array ordered by result', () => {
-          const entities = getEntities(state, { immutable: false })
-          expect(Iterable.isIterable(entities)).toBe(false)
-          expect(entities).toEqual([white, red, black])
-        })
-
-        it('should return entities array ordered by result (reverse)', () => {
-          const entities = getEntities(state, { reverse: true, immutable: false })
-          expect(Iterable.isIterable(entities)).toBe(false)
-          expect(entities).toEqual([black, red, white])
-        })
-      })
-    })
-
-    describe('getEntity', () => {
-      describe('(immutable)', () => {
-        it('should return entity', () => {
-          const entity = getEntity(state, 'black')
-          expect(Iterable.isIterable(entity)).toBe(true)
-          expect(entity.equals(fromJS(black))).toBe(true)
-        })
-      })
-
-      describe('(js)', () => {
-        it('should return entity', () => {
-          const entity = getEntity(state, 'black', { immutable: false })
-          expect(Iterable.isIterable(entity)).toBe(false)
-          expect(entity).toEqual(black)
-        })
-      })
-    })
-
-    describe('getStatus', () => {
-      let state = reducer(undefined, { type: 'test' })
-      it('should return status', () => {
-        for (const status of ['finding', 'creating']) {
-          state = state.setIn(['ui', status], true)
-          expect(getStatus(state, status)).toBe(true)
-        }
-        for (const status of ['findingOne', 'updating', 'deleting']) {
-          state = state.setIn(['ui', status, 'black'], true)
-          expect(getStatus(state, status, 'black')).toBe(true)
-        }
-      })
     })
   })
 })

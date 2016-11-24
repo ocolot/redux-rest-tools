@@ -1,13 +1,17 @@
 // @flow
 import { takeLatest } from 'redux-saga'
 import { put, call, fork } from 'redux-saga/effects'
-import axios from 'axios'
-import { Schema, arrayOf, normalize } from 'normalizr'
 import { camelizeKeys } from 'humps'
+
+import normalize from './normalize'
+import api from './api'
+
+import type { RequestConfigType } from './api'
 
 const restVerbs = ['find', 'findOne', 'create', 'update', 'delete']
 
-type RequestConfigType = { method: string, route: string, data: Object }
+type IdAttributeType = string|(entity: ?{}) => string
+
 type WatchOptionsType = {
   actions: {
     request: () => {},
@@ -17,8 +21,10 @@ type WatchOptionsType = {
   idAttribute: IdAttributeType,
   schema: {},
   requestConfig: RequestConfigType,
+  immutable: ?boolean,
+  camelizeKeys: ?boolean,
 }
-type ActionType = {
+export type ActionType = {
   type: string,
   payload: {},
   meta: ?{
@@ -29,68 +35,35 @@ type ActionType = {
   },
 }
 
-type IdAttributeType = string|(entity: ?{}) => string
-
-function replaceUrlParams(route, action) {
-  let url = route
-  const urlParams = url.match(/:[_a-zA-Z]+\b/g)
-
-  if (urlParams) {
-    for (const urlParam of urlParams) {
-      const key = urlParam.substring(1)
-      const value = action.payload[key]
-      if (!value) { throw new Error(`key ${key} missing in action ${action.type}`) }
-      url = url.replace(urlParam, value)
-    }
-  }
-  return url
-}
-
-function* fetchApi(options: WatchOptionsType, action: ActionType) {
-  const { schema, requestConfig: { route, ...config } } = options
-  config.url = replaceUrlParams(route, action)
-
-  if (!config.method) { throw new Error('method missing in watchRequest config') }
-  const method = config.method.toLowerCase()
-  if (['post', 'put', 'patch'].includes(method)) {
-    config.data = action.payload
-  }
-  if (method === 'get') {
-    config.params = action.payload
-  }
-
-  let { data } = yield axios.request(config)
-
-  if (action.camelizeKeys) {
-    data = camelizeKeys(data)
-  }
-
-  const {
-    result,
-    entities: { entities },
-  } = normalize(Array.isArray(data) ? data : [data], arrayOf(schema))
-
-  return { normalized: { result, entities: entities || {} }, data }
-}
-
-function* fetch(options: WatchOptionsType, action: ActionType) {
-  const { actions } = options
+export function* fetch(options: WatchOptionsType, action: ActionType): any {
+  const { actions, immutable, idAttribute, camelizeKeys, requestConfig } = options
   const { meta } = action
   try {
-    const { normalized, data } = yield call(fetchApi, options, action)
+    console.log('BEFORE CALL');
+    let data = yield call(api, requestConfig, action)
+    console.log('DATA');
+    console.log(data);
+    let normalized = normalize(data, idAttribute)
+    if (camelizeKeys) {
+      data = camelizeKeys(data)
+    }
+    if (!immutable) {
+      normalized = normalized.toJS()
+    }
+
     yield put(actions.success(normalized))
+
     if (meta) {
       const { onSuccess, onSuccessAction } = meta
-      if (onSuccess || onSuccessAction) {
-        if (onSuccessAction) {
-          const successAction = typeof onSuccessAction === 'function' ?
-            onSuccessAction(data) :
-            onSuccessAction
-          yield put(successAction)
-        }
-        if (onSuccess) {
-          onSuccess(data)
-        }
+
+      if (onSuccessAction) {
+        const successAction = typeof onSuccessAction === 'function' ?
+          onSuccessAction(data) :
+          onSuccessAction
+        yield put(successAction)
+      }
+      if (onSuccess) {
+        onSuccess(data)
       }
     }
   } catch (error) {
@@ -116,7 +89,6 @@ export function* watchRequest(options: WatchOptionsType): any {
   if (!actions.request || !actions.success || !actions.fail) {
     throw new Error('request, success and fail actions are required')
   }
-  options.schema = new Schema('entities', { idAttribute })
   const { type } = actions.request()
   yield* takeLatest(type, fetch, options)
 }

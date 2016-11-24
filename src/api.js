@@ -1,0 +1,45 @@
+// @flow
+import axios from 'axios'
+import type { ActionType } from './sagas'
+
+export type RequestConfigType = {
+  method: 'get'|'post'|'put'|'patch'|'delete',
+  route: string,
+  data: ?any,
+}
+
+function replaceUrlParams(route, action) {
+  let url = route
+  const urlParams = url.match(/:[_a-zA-Z]+\b/g)
+
+  if (urlParams) {
+    for (const urlParam of urlParams) {
+      const key = urlParam.substring(1)
+      const value = action.payload[key]
+      if (!value) { throw new Error(`Key ${key} missing in action ${action.type}`) }
+      url = url.replace(urlParam, value)
+    }
+  }
+  return url
+}
+
+export default function api(requestConfig: RequestConfigType, action: ActionType) {
+  const { route, ...config } = requestConfig
+  config.url = replaceUrlParams(route, action)
+
+  if (!config.method) { throw new Error('Method missing in watchRequest config') }
+  const method = config.method.toLowerCase()
+  if (['post', 'put', 'patch'].includes(method)) {
+    config.data = action.payload
+  }
+  if (method === 'get') {
+    config.params = action.payload
+  }
+
+  return axios
+    .request(config)
+    .then(response => {
+      if (!response.data) { throw new Error('Response data missing in api response') }
+      return response.data
+    })
+}

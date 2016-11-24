@@ -1,6 +1,6 @@
 {
   "name": "redux-rest-tools",
-  "version": "0.1.17",
+  "version": "0.2.0",
   "description": "Redux tools to handle REST requests",
   "main": "lib/index.js",
   "scripts": {
@@ -37,16 +37,15 @@
     "babel-plugin-transform-runtime": "^6.15.0",
     "babel-preset-latest": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
+    "expect": "^1.20.2",
     "mocha": "^3.1.2",
     "rimraf": "2.5.4"
   },
   "dependencies": {
     "axios": "^0.15.2",
     "babel-runtime": "^6.18.0",
-    "expect": "^1.20.2",
     "humps": "^2.0.0",
     "immutable": "^3.8.1",
-    "normalizr": "^2.2.1",
     "redux-actions": "^0.12.0",
     "redux-saga": "^0.12.0"
   }

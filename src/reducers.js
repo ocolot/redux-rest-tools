@@ -1,6 +1,6 @@
 // @flow
 import { handleActions } from 'redux-actions'
-import { fromJS, Map, Iterable, List } from 'immutable'
+import { fromJS, Map, Iterable } from 'immutable'
 
 export const initialState = fromJS({
   entities: {},
@@ -15,7 +15,7 @@ export const initialState = fromJS({
 })
 
 type RestReducerConfigType = {
-  idAttribute: IdAttributeType,
+  idAttribute: string,
   actions: {},
   extraHandlers: {},
 }
@@ -221,59 +221,3 @@ export function restReducer(config: RestReducerConfigType) {
 
   return handleActions(handlers, initialState)
 }
-
-// helpers
-
-type GetEntitiesOptionsType = {
-  reverse: ?bool,
-  immutable: ?bool,
-}
-
-const getEntitiesOptionsDefault = {
-  reverse: false,
-  immutable: true,
-}
-
-export function getEntities(reducerSubState: ?Map, options: GetEntitiesOptionsType = {}) {
-  options = { ...getEntitiesOptionsDefault, ...options }
-  const { immutable } = options
-
-  const empty = immutable ? List() : []
-  if (!reducerSubState) { return empty }
-  const entities = reducerSubState.get('entities')
-  let result = reducerSubState.get('result')
-  if (!entities || !result) { return empty }
-  if (options.reverse) { result = result.reverse() }
-  result = result.map(id => entities.get(id))
-  return immutable ? result : result.toJS()
-}
-
-type GetEntityOptionsType = {
-  immutable: ?bool,
-}
-
-const getEntityOptionsDefault = {
-  immutable: true,
-}
-
-export function getEntity(reducerSubState: ?Map, idAttribute: string, options: GetEntityOptionsType = {}) {
-  options = { ...getEntityOptionsDefault, ...options }
-  if (!reducerSubState) { return }
-  const entity = reducerSubState.getIn(['entities', idAttribute])
-  return entity ? (options.immutable ? entity : entity.toJS()) : undefined
-}
-
-const statuses = initialState.get('ui').keySeq()
-
-export function getStatus(reducerSubState: ?Map, status: string, idAttribute: ?string) {
-  if (!reducerSubState) { return }
-  if (!statuses.includes(status)) {
-    const allowedStatus = statuses.join(', ')
-    throw new Error(`In getStatus, status should be one of ${allowedStatus}`)
-  }
-  const path = ['ui', status]
-  if (idAttribute) { path.push(idAttribute) }
-  return reducerSubState.getIn(path)
-}
-
-export const helpers = { getEntities, getEntity, getStatus }

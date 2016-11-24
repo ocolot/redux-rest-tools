@@ -4,17 +4,20 @@ export {
   createReducerType,
   createReducerActions,
   createRestActions,
-} from './rest-actions'
+} from './actions'
 
 export {
   restReducer,
   handlerCreator,
-  getEntities,
-  getEntity,
-  getStatus,
-} from './rest-reducers'
+} from './reducers'
 
 export {
   watchRestRequests,
   watchRequest,
-} from './rest-sagas'
+} from './sagas'
+
+export {
+  getEntities,
+  getEntity,
+  getStatus,
+} from './helpers'
