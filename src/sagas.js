@@ -39,10 +39,7 @@ export function* fetch(options: WatchOptionsType, action: ActionType): any {
   const { actions, immutable, idAttribute, camelizeKeys, requestConfig } = options
   const { meta } = action
   try {
-    console.log('BEFORE CALL');
     let data = yield call(api, requestConfig, action)
-    console.log('DATA');
-    console.log(data);
     let normalized = normalize(data, idAttribute)
     if (camelizeKeys) {
       data = camelizeKeys(data)
