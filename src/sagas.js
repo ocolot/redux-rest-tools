@@ -23,6 +23,7 @@ type WatchOptionsType = {
   requestConfig: RequestConfigType,
   immutable: ?boolean,
   camelizeKeys: ?boolean,
+  isArray: boolean,
 }
 export type ActionType = {
   type: string,
@@ -36,15 +37,21 @@ export type ActionType = {
 }
 
 export function* fetch(options: WatchOptionsType, action: ActionType): any {
-  const { actions, immutable, idAttribute, camelizeKeys, requestConfig } = options
+  if (options.immutable === undefined) { options.immutable = true }
+  const { actions, immutable, idAttribute, requestConfig, isArray } = options
   const { meta } = action
   try {
     let data = yield call(api, requestConfig, action)
-    let normalized = normalize(data, idAttribute)
-    if (camelizeKeys) {
+
+    if (options.camelizeKeys) {
       data = camelizeKeys(data)
     }
-    if (!immutable) {
+
+    let normalized = normalize(data, idAttribute)
+
+    if (immutable) {
+      data = undefined // free memory
+    } else {
       normalized = normalized.toJS()
     }
 
@@ -53,14 +60,21 @@ export function* fetch(options: WatchOptionsType, action: ActionType): any {
     if (meta) {
       const { onSuccess, onSuccessAction } = meta
 
+      const payload = immutable ?
+        (isArray ?
+          normalized.get('entities').toList() :
+          normalized.getIn(['entities', 0])
+        ) :
+        data
+
       if (onSuccessAction) {
         const successAction = typeof onSuccessAction === 'function' ?
-          onSuccessAction(data) :
+          onSuccessAction(payload) :
           onSuccessAction
         yield put(successAction)
       }
       if (onSuccess) {
-        onSuccess(data)
+        onSuccess(payload)
       }
     }
   } catch (error) {
@@ -130,6 +144,7 @@ export function* watchRestRequests(restOptions: RestOptionsType): any {
       actions: actions[verb],
       requestConfig: { method, route },
       idAttribute,
+      isArray: verb === 'find',
     })
   }
 }
