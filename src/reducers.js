@@ -16,25 +16,16 @@ export const initialState = fromJS({
 
 type RestReducerConfigType = {
   idAttribute: string,
-  actions: {},
-  extraHandlers: {},
-}
-
-type RequestActionsType = {
-  request: Function,
-  success: Function,
-  fail: Function,
-}
-
-type ActionType = {
-  type: string,
-  payload: {},
-  meta: ?{
-    onSuccess: ?() => {},
-    onSuccessAction: ?any,
-    onFail: ?() => {},
-    onFailAction: ?any,
+  actions: {
+    find?: RequestActionsType,
+    findOne?: RequestActionsType,
+    create?: RequestActionsType,
+    update?: RequestActionsType,
+    delete?: RequestActionsType,
+    clear?: () => ActionType,
+    clearErrors?: () => ActionType,
   },
+  extraHandlers?: {},
 }
 
 export function getIdFromPayloadKey(action: ActionType, idAttribute: string) {
@@ -46,27 +37,19 @@ export function getIdFromPayloadKey(action: ActionType, idAttribute: string) {
   return id
 }
 
-export function getIdFromNormalizedPayload(action: ActionType) {
-  const { payload } = action
-  if (!payload) { throw new Error(`Action ${action.type} should include payload key`) }
-
-  const id = payload.result && payload.result[0]
-  if (!id) { throw new Error(`Payload of action ${action.type} should include result array (entities idAttributes)`) }
-
-  return id
-}
-
-export function getEntityFromAction(action: ActionType) {
-  const id = getIdFromNormalizedPayload(action)
-
-  const entity = action.payload.entities && action.payload.entities[id]
-  if (!entity) { throw new Error(`Payload of action ${action.type} shoud include key ${id} in entities`)}
-
-  return entity
-}
-
-function makeImmutable(obj: any) {
+function ensureImmutable(obj: any) {
   return Iterable.isIterable(obj) ? obj : fromJS(obj)
+}
+
+export function getEntity({ type, payload }: ActionType) {
+  if (!payload) { throw new Error(`${type} action should include payload`) }
+  return ensureImmutable(payload)
+}
+
+export function getEntityId(entity: Map<string, any>, idAttribute: string, type: string) {
+  const id = entity.get(idAttribute)
+  if (!id) { throw new Error(`${type} payload should include idAttribute (${idAttribute})`) }
+  return id
 }
 
 const verbHandlers = {
@@ -74,11 +57,18 @@ const verbHandlers = {
     return {
       [requestTypes.request]: (state) =>
         state.setIn(['ui', 'finding'], true),
-      [requestTypes.success]: (state, { payload: { entities, result } }) =>
-        state
-          .set('entities', makeImmutable(entities))
-          .set('result', makeImmutable(result))
-          .setIn(['ui', 'finding'], false),
+      [requestTypes.success]: (state, { type, payload }) => {
+        if (!payload) { throw new Error(`${type} action should include payload`) }
+        const isImmutable = Iterable.isIterable(payload)
+        const entities = isImmutable ? payload.get('entities') : fromJS(payload.entities)
+        if (!entities) { throw new Error(`${type} should include entities (map with idAttributes as keys)`) }
+        const result = isImmutable ? payload.get('result') : fromJS(payload.result)
+        if (!result) { throw new Error(`${type} should include result (idAttributes list)`) }
+        return state
+          .set('entities', entities)
+          .set('result', result)
+          .setIn(['ui', 'finding'], false)
+      },
       [requestTypes.fail]: (state, { payload: error }) =>
         state
           .setIn(['errors', 'find'], error)
@@ -93,10 +83,10 @@ const verbHandlers = {
         return state.setIn(['ui', 'findingOne', id], true)
       },
       [requestTypes.success]: (state, action) => {
-        const entity = getEntityFromAction(action)
-        const id = getIdFromNormalizedPayload(action)
+        const entity = getEntity(action)
+        const id = getEntityId(entity, idAttribute, action.type)
         return state
-          .setIn(['entities', id], makeImmutable(entity))
+          .setIn(['entities', id], entity)
           .update('result', list => {
             if (list.includes(id)) { return list }
             return list.push(id)
@@ -110,17 +100,16 @@ const verbHandlers = {
     }
   },
   create(requestTypes, idAttribute) {
-    // NOTE: add entity to entities
     return {
       [requestTypes.request]: (state) =>
         state
           .setIn(['ui', 'creating'], true),
       [requestTypes.success]: (state, action) => {
-        const entity = getEntityFromAction(action)
-        const id = getIdFromNormalizedPayload(action)
+        const entity = getEntity(action)
+        const id = getEntityId(entity, idAttribute, action.type)
         return state
-          .setIn(['entities', id], makeImmutable(entity))
-          .update('result', list => list.push(id))
+          .setIn(['entities', id], entity)
+          .update('result', list => list.push(id)) // NOTE: no unicity check
           .setIn(['ui', 'creating'], false)
       },
       [requestTypes.fail]: (state, { payload: error }) =>
@@ -138,10 +127,10 @@ const verbHandlers = {
           .setIn(['ui', 'updating', id], true)
       },
       [requestTypes.success]: (state, action) => {
-        const entity = getEntityFromAction(action)
-        const id = getIdFromNormalizedPayload(action)
+        const entity = getEntity(action)
+        const id = getEntityId(entity, idAttribute, action.type)
         return state
-          .setIn(['entities', id], makeImmutable(entity))
+          .setIn(['entities', id], entity)
           .deleteIn(['ui', 'updating', id])
       },
       [requestTypes.fail]: (state, { payload: error }) =>
@@ -158,7 +147,8 @@ const verbHandlers = {
           .setIn(['ui', 'deleting', id], true)
       },
       [requestTypes.success]: (state, action) => {
-        const id = getIdFromNormalizedPayload(action)
+        const entity = getEntity(action)
+        const id = getEntityId(entity, idAttribute, action.type)
         return state
           .deleteIn(['entities', id])
           .update('result', list => list.filter(idAttr => (idAttr !== id)))

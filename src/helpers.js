@@ -8,12 +8,14 @@ type GetEntitiesOptionsType = {
   immutable: ?bool,
 }
 
+type ReducerSubStateType = ?Map<string,any>
+
 const getEntitiesOptionsDefault = {
   reverse: false,
   immutable: true,
 }
 
-export function getEntities(reducerSubState: ?Map, options: GetEntitiesOptionsType = getEntitiesOptionsDefault) {
+export function getEntities(reducerSubState: ReducerSubStateType, options: GetEntitiesOptionsType = getEntitiesOptionsDefault) {
   options = { ...getEntitiesOptionsDefault, ...options }
   const { immutable } = options
 
@@ -35,7 +37,7 @@ const getEntityOptionsDefault = {
   immutable: true,
 }
 
-export function getEntity(reducerSubState: ?Map, idAttribute: string, options: GetEntityOptionsType = getEntityOptionsDefault) {
+export function getEntity(reducerSubState: ReducerSubStateType, idAttribute: string, options: GetEntityOptionsType = getEntityOptionsDefault) {
   options = { ...getEntityOptionsDefault, ...options }
   if (!reducerSubState) { return }
   const entity = reducerSubState.getIn(['entities', idAttribute])
@@ -44,7 +46,7 @@ export function getEntity(reducerSubState: ?Map, idAttribute: string, options: G
 
 const statuses = initialState.get('ui').keySeq()
 
-export function getStatus(reducerSubState: ?Map, status: string, idAttribute: ?string) {
+export function getStatus(reducerSubState: ReducerSubStateType, status: string, idAttribute: ?string) {
   if (!reducerSubState) { return }
   if (!statuses.includes(status)) {
     const allowedStatus = statuses.join(', ')

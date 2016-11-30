@@ -2,6 +2,7 @@
 import { takeLatest } from 'redux-saga'
 import { put, call, fork } from 'redux-saga/effects'
 import { camelizeKeys } from 'humps'
+import { Iterable, fromJS } from 'immutable'
 
 import normalize from './normalize'
 import api from './api'
@@ -13,27 +14,13 @@ const restVerbs = ['find', 'findOne', 'create', 'update', 'delete']
 type IdAttributeType = string|(entity: ?{}) => string
 
 type WatchOptionsType = {
-  actions: {
-    request: () => {},
-    success: () => {},
-    fail: () => {},
-  },
+  actions: RequestActionsType,
   idAttribute: IdAttributeType,
   schema: {},
   requestConfig: RequestConfigType,
   immutable: ?boolean,
   camelizeKeys: ?boolean,
   isArray: boolean,
-}
-export type ActionType = {
-  type: string,
-  payload: {},
-  meta: ?{
-    onSuccess: ?() => {},
-    onSuccessAction: ?any,
-    onFail: ?() => {},
-    onFailAction: ?any,
-  },
 }
 
 export function* fetch(options: WatchOptionsType, action: ActionType): any {
@@ -47,34 +34,26 @@ export function* fetch(options: WatchOptionsType, action: ActionType): any {
       data = camelizeKeys(data)
     }
 
-    let normalized = normalize(data, idAttribute)
-
-    if (immutable) {
-      data = undefined // free memory
-    } else {
-      normalized = normalized.toJS()
+    if (Array.isArray(data)) {
+      data = normalize(data, idAttribute)
     }
 
-    yield put(actions.success(normalized))
+    if (!immutable && Iterable.isIterable(data)) {
+      data = data.toJS()
+    }
+
+    yield put(actions.success(data))
 
     if (meta) {
       const { onSuccess, onSuccessAction } = meta
-
-      const payload = immutable ?
-        (isArray ?
-          normalized.get('entities').toList() :
-          normalized.getIn(['entities', 0])
-        ) :
-        data
-
       if (onSuccessAction) {
         const successAction = typeof onSuccessAction === 'function' ?
-          onSuccessAction(payload) :
+          onSuccessAction(data) :
           onSuccessAction
         yield put(successAction)
       }
       if (onSuccess) {
-        onSuccess(payload)
+        onSuccess(data)
       }
     }
   } catch (error) {
@@ -105,7 +84,7 @@ export function* watchRequest(options: WatchOptionsType): any {
 }
 
 type RestOptionsType = {
-  actions: ActionType,
+  actions: RequestActionsType,
   idAttribute: IdAttributeType, // NOTE: function call without parameters should return string (e.g. 'slug')
   baseRoute: string,
 }

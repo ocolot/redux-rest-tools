@@ -1,6 +1,5 @@
 // @flow
 import axios from 'axios'
-import type { ActionType } from './sagas'
 
 export type RequestConfigType = {
   method: 'get'|'post'|'put'|'patch'|'delete',
@@ -15,7 +14,7 @@ function replaceUrlParams(route, action) {
   if (urlParams) {
     for (const urlParam of urlParams) {
       const key = urlParam.substring(1)
-      const value = action.payload[key]
+      const value = action.payload && action.payload[key]
       if (!value) { throw new Error(`Key ${key} missing in action ${action.type}`) }
       url = url.replace(urlParam, value)
     }

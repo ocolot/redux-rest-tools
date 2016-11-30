@@ -1,0 +1,18 @@
+declare class ActionType {
+  type: string,
+  payload?: any,
+  meta?: {
+    onSuccess?: () => void,
+    onSuccessAction?: {}|ActionType,
+    onFail?: () => {},
+    onFailAction?: {}|ActionType,
+  },
+}
+
+declare function ActionCreatorType(): ActionType
+
+declare class RequestActionsType {
+  request: ActionCreatorType,
+  success: ActionCreatorType,
+  fail: ActionCreatorType,
+}

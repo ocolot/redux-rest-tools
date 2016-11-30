@@ -4,5 +4,6 @@ lib
 [include]
 
 [libs]
+./types.js.flow
 
 [options]

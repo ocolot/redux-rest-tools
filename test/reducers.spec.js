@@ -2,8 +2,8 @@ import expect from 'expect'
 import { fromJS, List, Iterable } from 'immutable'
 
 import { createRestActions } from '../src/actions'
-import { restReducer, getIdFromPayloadKey, getEntityFromAction, initialState } from '../src/reducers'
-import { black } from './dummies'
+import { restReducer, getIdFromPayloadKey, getEntity, initialState } from '../src/reducers'
+import { black, white } from './dummies'
 
 describe('restReducer', () => {
   const actions = createRestActions({
@@ -32,23 +32,20 @@ describe('restReducer', () => {
     })
   })
 
-  describe('getEntityFromAction', () => {
+  describe('getEntity', () => {
     it('should return entity from action', () => {
-      const action = { payload: { entities: { [black.name]: black }, result: [black.name] } }
-      expect(getEntityFromAction(action, 'name')).toEqual(black)
+      const action = { payload: black }
+      expect(getEntity(action).toJS()).toEqual(black)
     })
 
     it('should throw if action malformed', () => {
       const actions = [
+        {},
         { type: 'test' },
-        { type: 'test', payload: {} },
-        { type: 'test', payload: { entities: {} } },
-        { type: 'test', payload: { entities: { black: {} } } },
-        { type: 'test', payload: { result: ['black'] } },
-        { type: 'test', payload: { entities: { black: {} }, result: ['white'] } },
+        { type: 'test', payload: undefined },
       ]
       for (const action of actions) {
-        expect(getEntityFromAction.bind(this, action, 'name')).toThrow()
+        expect(getEntity.bind(this, action)).toThrow()
       }
     })
   })
@@ -135,27 +132,21 @@ describe('restReducer', () => {
 
     describe('success', () => {
       let state = reducer(undefined, actions.findOne.request({ name: 'black' }))
-      const entity = { name: 'black', type: 'grumpy' }
-      const findOneSuccessData = {
-        entities: {
-          white: { name: 'white', type: 'happy' },
-        },
-        result: ['white'],
-      }
+      // const findOneSuccessData = {
+      //   entities: {
+      //     white: { name: 'white', type: 'happy' },
+      //   },
+      //   result: ['white'],
+      // }
 
-      state = reducer(state, actions.findOne.success({
-        entities: {
-          black: entity,
-        },
-        result: ['black'],
-      }))
+      state = reducer(state, actions.findOne.success(black))
 
       it('should set ui.findingOne[idAttribute] to not exist', () => {
         expect(state.getIn(['ui', 'findingOne', 'black'])).toNotExist()
       })
 
       it('should add entity to entities', () => {
-        expect(state.getIn(['entities', 'black']).toJS()).toEqual(entity)
+        expect(state.getIn(['entities', 'black']).toJS()).toEqual(black)
       })
 
       it('should add idAttribute to result', () => {
@@ -163,16 +154,16 @@ describe('restReducer', () => {
       })
 
       it('should keep existing entities', () => {
-        state = reducer(state, actions.findOne.success(findOneSuccessData))
+        state = reducer(state, actions.findOne.success(white))
 
-        expect(state.getIn(['entities', 'black']).toJS()).toEqual(entity)
+        expect(state.getIn(['entities', 'black']).toJS()).toEqual(black)
         expect(state.get('result').includes('black')).toBe(true)
       })
 
       it('should add idAttribute once to result', () => {
-        let state = reducer(undefined, actions.findOne.success(findOneSuccessData))
-        state = reducer(state, actions.findOne.success(findOneSuccessData))
-        expect(state.get('result').count(r => r === 'white')).toBe(1)
+        let state = reducer(undefined, actions.findOne.success(black))
+        state = reducer(state, actions.findOne.success(black))
+        expect(state.get('result').count(r => r === 'black')).toBe(1)
       })
     })
 
@@ -201,20 +192,14 @@ describe('restReducer', () => {
 
     describe('success', () => {
       let state = reducer(undefined, actions.create.request({ name: 'black' }))
-      const entity = { name: 'black', type: 'grumpy' }
-      state = reducer(state, actions.create.success({
-        entities: {
-          black: entity,
-        },
-        result: ['black'],
-      }))
+      state = reducer(state, actions.create.success(black))
 
       it('should set ui.creating to false', () => {
         expect(state.getIn(['ui', 'creating'])).toBe(false)
       })
 
       it('should add entity to entities', () => {
-        expect(state.getIn(['entities', 'black']).toJS()).toEqual(entity)
+        expect(state.getIn(['entities', 'black']).toJS()).toEqual(black)
       })
 
       it('should add idAttribute to result', () => {
@@ -222,14 +207,9 @@ describe('restReducer', () => {
       })
 
       it('should keep existing entities', () => {
-        state = reducer(state, actions.create.success({
-          entities: {
-            white: { name: 'white', type: 'happy' },
-          },
-          result: ['white'],
-        }))
+        state = reducer(state, actions.create.success(white))
 
-        expect(state.getIn(['entities', 'black']).toJS()).toEqual(entity)
+        expect(state.getIn(['entities', 'black']).toJS()).toEqual(black)
         expect(state.get('result').includes('black')).toBe(true)
       })
     })
@@ -259,20 +239,10 @@ describe('restReducer', () => {
 
     describe('success', () => {
       let state = reducer(undefined, { type: 'test' })
-      const entity = { name: 'black', type: 'grumpy' }
-      state = reducer(undefined, actions.findOne.success({
-        entities: {
-          black: entity,
-        },
-        result: ['black'],
-      }))
-      const updatedEntity = { ...entity, type: 'no.'}
-      state = reducer(state, actions.update.success({
-        entities: {
-          black: updatedEntity,
-        },
-        result: ['black'],
-      }))
+      state = reducer(undefined, actions.findOne.success(black))
+
+      const updatedEntity = { ...black, type: 'no.'}
+      state = reducer(state, actions.update.success(updatedEntity))
 
       it('should set ui.findingOne[idAttribute] to not exist', () => {
         expect(state.getIn(['ui', 'updating', 'black'])).toNotExist()
@@ -287,12 +257,7 @@ describe('restReducer', () => {
       })
 
       it('should keep existing entities', () => {
-        state = reducer(state, actions.update.success({
-          entities: {
-            white: { name: 'white', type: 'happy' },
-          },
-          result: ['white'],
-        }))
+        state = reducer(state, actions.update.success(white))
 
         expect(state.getIn(['entities', 'black']).toJS()).toEqual(updatedEntity)
         expect(state.get('result').includes('black')).toBe(true)
@@ -324,21 +289,9 @@ describe('restReducer', () => {
 
     describe('success', () => {
       let state = reducer(undefined, { type: 'test' })
-      state = reducer(state, actions.findOne.success({
-        entities: {
-          black: { name: 'black', type: 'grumpy' },
-        },
-        result: ['black'],
-      }))
-      const normalizedDeleteSuccess = {
-        entities: {
-          black: { name: 'black' },
-        },
-        result: ['black'],
-      }
-
+      state = reducer(state, actions.findOne.success(black))
       state = reducer(state, actions.delete.request({ name: 'black' }))
-      state = reducer(state, actions.delete.success(normalizedDeleteSuccess))
+      state = reducer(state, actions.delete.success(black))
 
       it('should set ui.deleting[idAttribute] to not exist', () => {
         expect(state.getIn(['ui', 'deleting', 'black'])).toNotExist()
@@ -353,15 +306,14 @@ describe('restReducer', () => {
       })
 
       it('should keep other entities', () => {
-        const white = { name: 'white', type: 'happy' }
         state = reducer(state, actions.find.success({
           entities: {
-            white: { name: 'white', type: 'happy' },
-            black: { name: 'black', type: 'grumpy' },
+            white,
+            black,
           },
           result: ['white', 'black'],
         }))
-        state = reducer(state, actions.delete.success(normalizedDeleteSuccess))
+        state = reducer(state, actions.delete.success(black))
 
         expect(state.getIn(['entities', 'black'])).toNotExist()
         expect(state.get('result').includes('black')).toBe(false)
