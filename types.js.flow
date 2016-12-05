@@ -16,3 +16,8 @@ declare class RequestActionsType {
   success: ActionCreatorType,
   fail: ActionCreatorType,
 }
+
+declare class RestActionsConfig {
+  collection: string,
+  verbs: [string],
+}
