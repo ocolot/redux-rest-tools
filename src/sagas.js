@@ -6,10 +6,7 @@ import { Iterable, fromJS } from 'immutable'
 
 import normalize from './normalize'
 import api from './api'
-
-import type { RequestConfigType } from './api'
-
-const restVerbs = ['find', 'findOne', 'create', 'update', 'delete']
+import { restVerbs } from './reducers'
 
 type IdAttributeType = string|(entity: ?{}) => string
 

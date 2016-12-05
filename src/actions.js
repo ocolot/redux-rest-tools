@@ -1,8 +1,7 @@
 // @flow
 import { createAction as createReduxAction } from 'redux-actions'
 
-const requestSuffixes = ['request', 'success', 'fail']
-const reducerSuffixes = ['clear', 'clearErrors']
+import { requestSuffixes, reducerSuffixes } from './shared'
 
 export const createType = (...array: any) =>
   array.map(str => str.toUpperCase()).join('_')
@@ -31,6 +30,11 @@ export const createReducerActions = (collection: string) =>
     result[suffix] = createAction(type)
     return result
   }, {})
+
+type RestActionsConfig = {
+  collection: string,
+  verbs: [string],
+}
 
 export function createRestActions(config: RestActionsConfig) {
   const { collection, verbs } = config

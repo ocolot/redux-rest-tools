@@ -17,21 +17,8 @@ declare class RequestActionsType {
   fail: ActionCreatorType,
 }
 
-declare class RestActionsConfig {
-  collection: string,
-  verbs: [string],
-}
-
-declare class RestReducerConfigType {
-  idAttribute: string,
-  actions: {
-    find?: RequestActionsType,
-    findOne?: RequestActionsType,
-    create?: RequestActionsType,
-    update?: RequestActionsType,
-    delete?: RequestActionsType,
-    clear?: () => ActionType,
-    clearErrors?: () => ActionType,
-  },
-  extraHandlers?: {},
+declare class RequestConfigType {
+  method: 'get'|'post'|'put'|'patch'|'delete',
+  route: string,
+  data: ?any,
 }

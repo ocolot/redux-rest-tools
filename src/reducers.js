@@ -2,6 +2,8 @@
 import { handleActions } from 'redux-actions'
 import { fromJS, Map, Iterable } from 'immutable'
 
+import { requestSuffixes } from './shared'
+
 export const initialState = fromJS({
   entities: {},
   result: [],
@@ -148,30 +150,53 @@ const verbHandlers = {
   },
 }
 
+export const restVerbs = Object.keys(verbHandlers)
+
+export const reducerHandlers = {
+  clear() { return initialState },
+  clearErrors(state: Map<string, any>) { return state.delete('errors') }
+}
+
+export const reducerSuffixes = Object.keys(reducerHandlers)
+
 export function handlerCreator(verb: string, requestActions: RequestActionsType, idAttribute: string) {
   const handler = verbHandlers[verb]
 
   if (!handler) { throw new Error(`${verb} handler not found`) }
 
-  const suffixes = ['request', 'success', 'fail']
-
-  for (const suffix of suffixes) {
+  for (const suffix of requestSuffixes) {
     if (!requestActions[suffix]) {
       throw new Error(`${suffix} actions is required for ${verb} verb`)
     }
   }
-  const requestTypes = {
-    request: requestActions.request().type,
-    success: requestActions.success().type,
-    fail: requestActions.fail().type,
-  }
+
+  const requestTypes = requestSuffixes.reduce((acc, suffix) => {
+    acc[suffix] = requestActions[suffix]().type
+    return acc
+  }, {})
+
   return handler(requestTypes, idAttribute)
+}
+
+type RestReducerConfigType = {
+  idAttribute: string,
+  actions: {
+    find?: RequestActionsType,
+    findOne?: RequestActionsType,
+    create?: RequestActionsType,
+    update?: RequestActionsType,
+    delete?: RequestActionsType,
+    clear?: () => ActionType,
+    clearErrors?: () => ActionType,
+  },
+  extraHandlers?: {},
 }
 
 export function restReducer(config: RestReducerConfigType) {
   const { actions, idAttribute, extraHandlers } = config
   if (!actions) { throw new Error('actions is required in restReducer config') }
 
+  // request handlers
   const handlers = Object.keys(verbHandlers).reduce((result, verb) => {
     const requestActions = actions[verb]
     if (requestActions) {
@@ -185,14 +210,12 @@ export function restReducer(config: RestReducerConfigType) {
     Object.assign(handlers, extraHandlers)
   }
 
-  if (actions.clear) {
-    const { type } = actions.clear()
-    handlers[type] = () => initialState
-  }
-
-  if (actions.clearErrors) {
-    const { type } = actions.clearErrors()
-    handlers[type] = state => state.delete('errors')
+  // reducer handlers
+  for(const key of reducerSuffixes) {
+    if (actions[key] && typeof actions[key] === 'function') {
+      const { type } = actions[key]()
+      handlers[type] = reducerHandlers[key]
+    }
   }
 
   return handleActions(handlers, initialState)

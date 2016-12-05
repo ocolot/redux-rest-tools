@@ -1,12 +1,6 @@
 // @flow
 import axios from 'axios'
 
-export type RequestConfigType = {
-  method: 'get'|'post'|'put'|'patch'|'delete',
-  route: string,
-  data: ?any,
-}
-
 function replaceUrlParams(route, action) {
   let url = route
   const urlParams = url.match(/:[_a-zA-Z]+\b/g)
