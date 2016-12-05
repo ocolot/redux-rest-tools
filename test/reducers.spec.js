@@ -1,9 +1,20 @@
 import expect from 'expect'
-import { fromJS, List, Iterable } from 'immutable'
+import Immutable, { fromJS, List, Iterable } from 'immutable'
 
 import { createRestActions } from '../src/actions'
 import { restReducer, getIdFromPayloadKey, getEntity, initialState } from '../src/reducers'
-import { black, white } from './dummies'
+import { black, white, normalizedCats } from './dummies'
+
+function shouldHandleImmutablePayload(action) {
+  it('should handle immutable payload without js conversion', () => {
+    const fromJSSpy = expect.spyOn(Immutable, 'fromJS')
+    const toJSSpy = expect.spyOn(action.payload, 'toJS')
+    expect(fromJSSpy).toNotHaveBeenCalled()
+    expect(toJSSpy).toNotHaveBeenCalled()
+    toJSSpy.restore()
+    fromJSSpy.restore()
+  })
+}
 
 describe('restReducer', () => {
   const actions = createRestActions({
@@ -86,25 +97,22 @@ describe('restReducer', () => {
 
     describe('success', () => {
       let state = reducer(undefined, actions.find.request({ name: 'black' }))
-      const black = { name: 'black', type: 'grumpy' }
-      const white = { name: 'white', type: 'happy' }
 
-      state = reducer(state, actions.find.success({
-        entities: { black, white },
-        result: ['black', 'white'],
-      }))
+      state = reducer(state, actions.find.success(normalizedCats))
 
       it('should set ui.finding to false', () => {
         expect(state.getIn(['ui', 'finding'])).toBe(false)
       })
 
       it('should replace entities', () => {
-        expect(state.get('entities').toJS()).toEqual({ black, white})
+        expect(state.get('entities').toJS()).toEqual(normalizedCats.entities)
       })
 
       it('should replace result', () => {
-        expect(state.get('result').toJS()).toEqual(['black', 'white'])
+        expect(state.get('result').toJS()).toEqual(normalizedCats.result)
       })
+
+      shouldHandleImmutablePayload(actions.find.success(fromJS(normalizedCats)))
     })
 
     describe('fail', () => {
@@ -132,12 +140,6 @@ describe('restReducer', () => {
 
     describe('success', () => {
       let state = reducer(undefined, actions.findOne.request({ name: 'black' }))
-      // const findOneSuccessData = {
-      //   entities: {
-      //     white: { name: 'white', type: 'happy' },
-      //   },
-      //   result: ['white'],
-      // }
 
       state = reducer(state, actions.findOne.success(black))
 
@@ -165,6 +167,8 @@ describe('restReducer', () => {
         state = reducer(state, actions.findOne.success(black))
         expect(state.get('result').count(r => r === 'black')).toBe(1)
       })
+
+      shouldHandleImmutablePayload(actions.findOne.success(fromJS(black)))
     })
 
     describe('fail', () => {
@@ -212,6 +216,8 @@ describe('restReducer', () => {
         expect(state.getIn(['entities', 'black']).toJS()).toEqual(black)
         expect(state.get('result').includes('black')).toBe(true)
       })
+
+      shouldHandleImmutablePayload(actions.create.success(fromJS(black)))
     })
 
     describe('fail', () => {
@@ -262,6 +268,8 @@ describe('restReducer', () => {
         expect(state.getIn(['entities', 'black']).toJS()).toEqual(updatedEntity)
         expect(state.get('result').includes('black')).toBe(true)
       })
+
+      shouldHandleImmutablePayload(actions.update.success(fromJS(black)))
     })
 
     describe('fail', () => {
@@ -320,6 +328,8 @@ describe('restReducer', () => {
         expect(state.getIn(['entities', 'white']).toJS()).toEqual(white)
         expect(state.get('result').includes('white')).toBe(true)
       })
+
+      shouldHandleImmutablePayload(actions.delete.success(fromJS(black)))
     })
 
     describe('fail', () => {
