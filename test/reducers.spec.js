@@ -2,7 +2,9 @@ import expect from 'expect'
 import Immutable, { fromJS, List, Iterable } from 'immutable'
 
 import { createRestActions } from '../src/actions'
-import { restReducer, getIdFromPayloadKey, getEntity, initialState } from '../src/reducers'
+import {
+  restReducer, getIdFromPayloadKey, getEntity, getEntityId, initialState,
+} from '../src/reducers'
 import { black, white, normalizedCats } from './dummies'
 
 function shouldHandleImmutablePayload(action) {
@@ -58,6 +60,17 @@ describe('restReducer', () => {
       for (const action of actions) {
         expect(getEntity.bind(this, action)).toThrow()
       }
+    })
+  })
+
+  describe('getEntityId', () => {
+    const entity = fromJS(black)
+    it('should throw if id undefined', () => {
+      expect(getEntityId.bind(this, entity, 'does_not_exist', 'TEST_TYPE')).toThrow()
+    })
+
+    it('should return entity id', () => {
+      expect(getEntityId(entity, 'name', 'TEST_TYPE')).toBe('black')
     })
   })
 

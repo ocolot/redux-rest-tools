@@ -14,20 +14,6 @@ export const initialState = fromJS({
   },
 })
 
-type RestReducerConfigType = {
-  idAttribute: string,
-  actions: {
-    find?: RequestActionsType,
-    findOne?: RequestActionsType,
-    create?: RequestActionsType,
-    update?: RequestActionsType,
-    delete?: RequestActionsType,
-    clear?: () => ActionType,
-    clearErrors?: () => ActionType,
-  },
-  extraHandlers?: {},
-}
-
 export function getIdFromPayloadKey(action: ActionType, idAttribute: string) {
   const { payload } = action
   if (!payload) { throw new Error(`Action ${action.type} should include payload key`) }

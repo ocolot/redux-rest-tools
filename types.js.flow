@@ -21,3 +21,17 @@ declare class RestActionsConfig {
   collection: string,
   verbs: [string],
 }
+
+declare class RestReducerConfigType {
+  idAttribute: string,
+  actions: {
+    find?: RequestActionsType,
+    findOne?: RequestActionsType,
+    create?: RequestActionsType,
+    update?: RequestActionsType,
+    delete?: RequestActionsType,
+    clear?: () => ActionType,
+    clearErrors?: () => ActionType,
+  },
+  extraHandlers?: {},
+}
