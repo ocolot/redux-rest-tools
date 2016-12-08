@@ -2,7 +2,7 @@
   "parser": "babel-eslint",
   "extends": "airbnb",
   "rules": {
-    "semi": ["error", "never"],
+    "semi": "error",
     "new-cap": [2, { "capIsNewExceptions": ["Map", "List"] }],
   }
 }
