@@ -35,8 +35,14 @@ export function* fetch(options: WatchOptionsType, action: ActionType): any {
       data = normalize(data, idAttribute)
     }
 
-    if (!immutable && Iterable.isIterable(data)) {
-      data = data.toJS()
+    if (immutable) {
+      if (!Iterable.isIterable(data)) {
+        data = fromJS(data)
+      }
+    } else {
+      if (Iterable.isIterable(data)) {
+        data = data.toJS()
+      }
     }
 
     yield put(actions.success(data))
