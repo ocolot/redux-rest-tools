@@ -26,6 +26,7 @@ export default function api(requestConfig: RequestConfigType, action: ActionType
     config.data = action.payload
   }
   if (method === 'get') {
+    // TODO only add params that were not replaced in route
     config.params = action.payload
   }
 

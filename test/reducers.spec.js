@@ -34,6 +34,11 @@ describe('restReducer', () => {
       expect(getIdFromPayloadKey(action, 'name')).toBe('black')
     })
 
+    it('should return idAttribute from payload (idAttribute: string array)', () => {
+      const action = { payload: { deep: { id: 42 } } }
+      expect(getIdFromPayloadKey(action, ['deep', 'id'])).toBe(42)
+    })
+
     it('should throw if idAttribute not found', () => {
       const actions = [
         { type: 'test' },
@@ -69,8 +74,13 @@ describe('restReducer', () => {
       expect(getEntityId.bind(this, entity, 'does_not_exist', 'TEST_TYPE')).toThrow()
     })
 
-    it('should return entity id', () => {
+    it('should return entity id (path as string)', () => {
       expect(getEntityId(entity, 'name', 'TEST_TYPE')).toBe('black')
+    })
+
+    it('should return entity id (path as string array)', () => {
+      const entitwo = fromJS({ deep: { id: 42 } })
+      expect(getEntityId(entitwo, ['deep', 'id'], 'TEST_TYPE')).toBe(42)
     })
   })
 

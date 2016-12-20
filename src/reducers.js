@@ -16,11 +16,22 @@ export const initialState = fromJS({
   },
 })
 
-export function getIdFromPayloadKey(action: ActionType, idAttribute: string) {
+type IdAttributeType = string | [string]
+
+export function getIdFromPayloadKey(action: ActionType, idAttribute: IdAttributeType) {
   const { payload } = action
   if (!payload) { throw new Error(`Action ${action.type} should include payload key`) }
 
-  const id = payload[idAttribute]
+  let id
+  if (typeof idAttribute === 'string') {
+    id = payload[idAttribute]
+  } else if (Array.isArray(idAttribute)) {
+    id = idAttribute.reduce((acc, key) => {
+      if (!acc) { throw new Error(`Key ${key} not found in action payload`) }
+      return acc[key]
+    }, payload)
+  }
+
   if (!id) { throw new Error(`Payload of action ${action.type} should include idAttribute key`) }
   return id
 }
@@ -34,8 +45,14 @@ export function getEntity({ type, payload }: ActionType) {
   return ensureImmutable(payload)
 }
 
-export function getEntityId(entity: Map<string, any>, idAttribute: string, type: string) {
-  const id = entity.get(idAttribute)
+export function getEntityId(entity: Map<string, any>, idAttribute: IdAttributeType, type: string) {
+  let id
+  if (typeof idAttribute === 'string') {
+    id = entity.get(idAttribute)
+  } else if (Array.isArray(idAttribute)) {
+    id = entity.getIn(idAttribute)
+  }
+
   if (!id) { throw new Error(`${type} payload should include idAttribute (${idAttribute})`) }
   return id
 }
@@ -64,7 +81,6 @@ const verbHandlers = {
     }
   },
   findOne(requestTypes, idAttribute) {
-    // NOTE: add entity to entities
     return {
       [requestTypes.request]: (state, action) => {
         const id = getIdFromPayloadKey(action, idAttribute)
