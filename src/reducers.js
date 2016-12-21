@@ -53,7 +53,7 @@ export function getEntityId(entity: Map<string, any>, idAttribute: IdAttributeTy
     id = entity.getIn(idAttribute)
   }
 
-  if (!id) { throw new Error(`${type} payload should include idAttribute (${idAttribute})`) }
+  if (!id) { throw new Error(`${type} payload should include idAttribute (${JSON.stringify(idAttribute)})`) }
   return id
 }
 
