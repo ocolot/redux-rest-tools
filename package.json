@@ -1,6 +1,6 @@
 {
   "name": "redux-rest-tools",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Redux tools to handle REST requests",
   "main": "lib/index.js",
   "scripts": {
@@ -37,6 +37,7 @@
     "babel-plugin-transform-runtime": "^6.15.0",
     "babel-preset-latest": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
+    "eslint-plugin-flowtype": "^2.29.1",
     "expect": "^1.20.2",
     "mocha": "^3.1.2",
     "rimraf": "2.5.4"

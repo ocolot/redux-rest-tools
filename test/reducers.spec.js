@@ -24,22 +24,22 @@ describe('restReducer', () => {
     verbs: ['find', 'findOne', 'create', 'update', 'delete'],
   })
   const reducer = restReducer({
-    idAttribute: 'name', // TODO: test when function(entity) { return entity.name }
+    idPath: 'name', // TODO: test when function(entity) { return entity.name }
     actions,
   })
 
   describe('getIdFromPayloadKey', () => {
-    it('should return idAttribute from payload (idAttribute: string)', () => {
+    it('should return idPath from payload (idPath: string)', () => {
       const action = { payload: { name: 'black' } }
       expect(getIdFromPayloadKey(action, 'name')).toBe('black')
     })
 
-    it('should return idAttribute from payload (idAttribute: string array)', () => {
+    it('should return idPath from payload (idPath: string array)', () => {
       const action = { payload: { deep: { id: 42 } } }
       expect(getIdFromPayloadKey(action, ['deep', 'id'])).toBe(42)
     })
 
-    it('should throw if idAttribute not found', () => {
+    it('should throw if idPath not found', () => {
       const actions = [
         { type: 'test' },
         { type: 'test', payload: { type: 'grumpy' } },
@@ -155,7 +155,7 @@ describe('restReducer', () => {
 
   describe('findOne', () => {
     describe('request', () => {
-      it('should set ui.findingOne[idAttribute] to true', () => {
+      it('should set ui.findingOne[idPath] to true', () => {
         const state = reducer(undefined, actions.findOne.request({ name: 'black' }))
         expect(state.getIn(['ui', 'findingOne', 'black'])).toBe(true)
       })
@@ -166,7 +166,7 @@ describe('restReducer', () => {
 
       state = reducer(state, actions.findOne.success(black))
 
-      it('should set ui.findingOne[idAttribute] to not exist', () => {
+      it('should set ui.findingOne[idPath] to not exist', () => {
         expect(state.getIn(['ui', 'findingOne', 'black'])).toNotExist()
       })
 
@@ -174,7 +174,7 @@ describe('restReducer', () => {
         expect(state.getIn(['entities', 'black']).toJS()).toEqual(black)
       })
 
-      it('should add idAttribute to result', () => {
+      it('should add idPath to result', () => {
         expect(state.get('result').includes('black')).toBe(true)
       })
 
@@ -185,7 +185,7 @@ describe('restReducer', () => {
         expect(state.get('result').includes('black')).toBe(true)
       })
 
-      it('should add idAttribute once to result', () => {
+      it('should add idPath once to result', () => {
         let state = reducer(undefined, actions.findOne.success(black))
         state = reducer(state, actions.findOne.success(black))
         expect(state.get('result').count(r => r === 'black')).toBe(1)
@@ -199,7 +199,7 @@ describe('restReducer', () => {
       const error = new Error('test')
       state = reducer(state, actions.findOne.fail(error))
 
-      it('should set ui.findingOne[idAttribute] to not exist', () => {
+      it('should set ui.findingOne[idPath] to not exist', () => {
         expect(state.getIn(['ui', 'findingOne', 'black'])).toNotExist()
       })
 
@@ -229,7 +229,7 @@ describe('restReducer', () => {
         expect(state.getIn(['entities', 'black']).toJS()).toEqual(black)
       })
 
-      it('should add idAttribute to result', () => {
+      it('should add idPath to result', () => {
         expect(state.get('result').includes('black')).toBe(true)
       })
 
@@ -261,7 +261,7 @@ describe('restReducer', () => {
   describe('update', () => {
     describe('request', () => {
       const state = reducer(undefined, actions.update.request({ name: 'black' }))
-      it('should set ui.updating[idAttribute] to true', () => {
+      it('should set ui.updating[idPath] to true', () => {
         expect(state.getIn(['ui', 'updating', 'black'])).toBe(true)
       })
     })
@@ -273,7 +273,7 @@ describe('restReducer', () => {
       const updatedEntity = { ...black, type: 'no.'}
       state = reducer(state, actions.update.success(updatedEntity))
 
-      it('should set ui.findingOne[idAttribute] to not exist', () => {
+      it('should set ui.findingOne[idPath] to not exist', () => {
         expect(state.getIn(['ui', 'updating', 'black'])).toNotExist()
       })
 
@@ -281,7 +281,7 @@ describe('restReducer', () => {
         expect(state.getIn(['entities', 'black']).toJS()).toEqual(updatedEntity)
       })
 
-      it('should keep idAttribute in result', () => {
+      it('should keep idPath in result', () => {
         expect(state.get('result').includes('black')).toBe(true)
       })
 
@@ -300,7 +300,7 @@ describe('restReducer', () => {
       const error = new Error('test')
       state = reducer(state, actions.update.fail(error))
 
-      it('should set ui.updating[idAttribute] to not exist', () => {
+      it('should set ui.updating[idPath] to not exist', () => {
         expect(state.getIn(['ui', 'updating', 'black'])).toNotExist()
       })
 
@@ -312,7 +312,7 @@ describe('restReducer', () => {
 
   describe('delete', () => {
     describe('request', () => {
-      it('should set ui.deleting[idAttribute] to true', () => {
+      it('should set ui.deleting[idPath] to true', () => {
         const state = reducer(undefined, actions.delete.request({ name: 'black' }))
         expect(state.getIn(['ui', 'deleting', 'black'])).toBe(true)
       })
@@ -324,7 +324,7 @@ describe('restReducer', () => {
       state = reducer(state, actions.delete.request({ name: 'black' }))
       state = reducer(state, actions.delete.success(black))
 
-      it('should set ui.deleting[idAttribute] to not exist', () => {
+      it('should set ui.deleting[idPath] to not exist', () => {
         expect(state.getIn(['ui', 'deleting', 'black'])).toNotExist()
       })
 
@@ -332,7 +332,7 @@ describe('restReducer', () => {
         expect(state.getIn(['entities', 'black'])).toNotExist()
       })
 
-      it('should remove idAttribute to result', () => {
+      it('should remove idPath to result', () => {
         expect(state.get('result').includes('black')).toBe(false)
       })
 
@@ -360,7 +360,7 @@ describe('restReducer', () => {
       const error = new Error('test')
       state = reducer(state, actions.delete.fail(error))
 
-      it('should set ui.deleting[idAttribute] to not exist', () => {
+      it('should set ui.deleting[idPath] to not exist', () => {
         expect(state.getIn(['ui', 'deleting', 'black'])).toNotExist()
       })
 

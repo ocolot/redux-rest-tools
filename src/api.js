@@ -1,24 +1,24 @@
 // @flow
 import axios from 'axios'
 
-function replaceUrlParams(route, action) {
-  let url = route
-  const urlParams = url.match(/:[_a-zA-Z]+\b/g)
+import { get } from './helpers'
 
-  if (urlParams) {
-    for (const urlParam of urlParams) {
-      const key = urlParam.substring(1)
-      const value = action.payload && action.payload[key]
-      if (!value) { throw new Error(`Key ${key} missing in action ${action.type}`) }
-      url = url.replace(urlParam, value)
-    }
-  }
-  return url
+export function replaceRouteParams(route: string, action: ActionType) {
+  const urlParams = route.match(/:[_a-zA-Z\.]+\b/g)
+
+  if (!urlParams) { return route }
+
+  return urlParams.reduce((url, urlParam) => {
+    const path = urlParam.substring(1)
+    const value = get(action.payload, path)
+    if (!value) { throw new Error(`Key ${path} missing in action ${action.type}`) }
+    return url.replace(urlParam, value)
+  }, route)
 }
 
-export default function api(requestConfig: RequestConfigType, action: ActionType) {
+export default function request(requestConfig: RequestConfigType, action: ActionType) {
   const { route, ...config } = requestConfig
-  config.url = replaceUrlParams(route, action)
+  config.url = replaceRouteParams(route, action)
 
   if (!config.method) { throw new Error('Method missing in watchRequest config') }
   const method = config.method.toLowerCase()

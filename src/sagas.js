@@ -8,11 +8,9 @@ import normalize from './normalize'
 import api from './api'
 import { restVerbs } from './reducers'
 
-type IdAttributeType = string|(entity: ?{}) => string
-
 type WatchOptionsType = {
   actions: RequestActionsType,
-  idAttribute: IdAttributeType,
+  idPath: IdPathType,
   schema: {},
   requestConfig: RequestConfigType,
   immutable: ?boolean,
@@ -22,7 +20,7 @@ type WatchOptionsType = {
 
 export function* fetch(options: WatchOptionsType, action: ActionType): any {
   if (options.immutable === undefined) { options.immutable = true }
-  const { actions, immutable, idAttribute, requestConfig, isArray } = options
+  const { actions, immutable, idPath, requestConfig, isArray } = options
   const { meta } = action
   try {
     let data = yield call(api, requestConfig, action)
@@ -32,7 +30,7 @@ export function* fetch(options: WatchOptionsType, action: ActionType): any {
     }
 
     if (Array.isArray(data)) {
-      data = normalize(data, idAttribute)
+      data = normalize(data, idPath)
     }
 
     if (immutable) {
@@ -77,7 +75,7 @@ export function* fetch(options: WatchOptionsType, action: ActionType): any {
 }
 
 export function* watchRequest(options: WatchOptionsType): any {
-  const { actions, idAttribute } = options
+  const { actions, idPath } = options
   if (!actions) { throw new Error('actions are required') }
   if (!actions.request || !actions.success || !actions.fail) {
     throw new Error('request, success and fail actions are required')
@@ -88,18 +86,18 @@ export function* watchRequest(options: WatchOptionsType): any {
 
 type RestOptionsType = {
   actions: RequestActionsType,
-  idAttribute: IdAttributeType, // NOTE: function call without parameters should return string (e.g. 'slug')
+  idPath: IdPathType, // NOTE: function call without parameters should return string (e.g. 'slug')
   baseRoute: string,
 }
 
 export function* watchRestRequests(restOptions: RestOptionsType): any {
-  const { actions, idAttribute, baseRoute } = restOptions
-  if (!idAttribute || !['string', 'function'].includes(typeof idAttribute)) {
-    throw new Error('In watchRestRequests, idAttribute must be a string or a function')
+  const { actions, idPath, baseRoute } = restOptions
+  if (!idPath || !['string', 'function'].includes(typeof idPath)) {
+    throw new Error('In watchRestRequests, idPath must be a string or a function')
   }
 
   const verbs = Object.keys(actions)
-  const idAttributeString = typeof idAttribute === 'function' ? idAttribute() : idAttribute
+  const idPathString = typeof idPath === 'function' ? idPath() : idPath
   for (const verb of verbs) {
     if (!restVerbs.includes(verb)) {
       continue
@@ -108,24 +106,24 @@ export function* watchRestRequests(restOptions: RestOptionsType): any {
     let route = baseRoute
     switch (verb) {
       case 'findOne':
-        route += `/:${idAttributeString}`
+        route += `/:${idPathString}`
         break
       case 'create':
         method = 'post'
         break
       case 'update':
         method = 'put'
-        route += `/:${idAttributeString}`
+        route += `/:${idPathString}`
         break
       case 'delete':
         method = 'delete'
-        route += `/:${idAttributeString}`
+        route += `/:${idPathString}`
         break
     }
     yield fork(watchRequest, {
       actions: actions[verb],
       requestConfig: { method, route },
-      idAttribute,
+      idPath,
       isArray: verb === 'find',
     })
   }

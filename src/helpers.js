@@ -1,5 +1,5 @@
 // @flow
-import { Map, List } from 'immutable'
+import { Map, List, Iterable } from 'immutable'
 
 import { initialState } from './reducers'
 
@@ -37,22 +37,43 @@ const getEntityOptionsDefault = {
   immutable: true,
 }
 
-export function getEntity(reducerSubState: ReducerSubStateType, idAttribute: string, options: GetEntityOptionsType = getEntityOptionsDefault) {
+export function getEntity(reducerSubState: ReducerSubStateType, key: string, options: GetEntityOptionsType = getEntityOptionsDefault) {
   options = { ...getEntityOptionsDefault, ...options }
   if (!reducerSubState) { return }
-  const entity = reducerSubState.getIn(['entities', idAttribute])
+  const entity = reducerSubState.getIn(['entities', key])
   return entity ? (options.immutable ? entity : entity.toJS()) : undefined
 }
 
-const statuses = initialState.get('ui').keySeq()
-
-export function getStatus(reducerSubState: ReducerSubStateType, status: string, idAttribute: ?string) {
+let statuses
+export function getStatus(reducerSubState: ReducerSubStateType, status: string, key: ?string) {
+  if (!statuses) { statuses = initialState.get('ui').keySeq() }
   if (!reducerSubState) { return }
   if (!statuses.includes(status)) {
     const allowedStatus = statuses.join(', ')
     throw new Error(`In getStatus, status should be one of ${allowedStatus}`)
   }
   const path = ['ui', status]
-  if (idAttribute) { path.push(idAttribute) }
+  if (key) { path.push(key) }
   return reducerSubState.getIn(path)
+}
+
+export function get(obj: EntityType, path: IdPathType) {
+  if (!obj) { return }
+
+  if (typeof path === 'string' || Array.isArray(path)) {
+    const keys = typeof path === 'string' ? path.split('.') : path
+    if (Iterable.isIterable(obj)) {
+      if (!obj.hasIn(keys)) { throw new Error(`Path ${JSON.stringify(keys)} not found in ${JSON.stringify(obj.toJS())}`) }
+      return obj.getIn(keys)
+    } else {
+      return keys.reduce((acc, key) => {
+        if (!(key in acc)) { throw new Error(`Path ${JSON.stringify(keys)} not found in ${JSON.stringify(obj)}`) }
+        return acc[key]
+      }, obj)
+    }
+  }
+
+  if (typeof path === 'function') {
+    return path(obj)
+  }
 }

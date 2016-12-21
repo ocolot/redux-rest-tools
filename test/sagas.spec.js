@@ -6,14 +6,14 @@ import { fetch } from '../src/sagas'
 import * as api from '../src/api'
 import { cats } from './dummies'
 
-const idAttribute = 'id'
+const idPath = 'id'
 const getDefaultOptions = () => ({
   actions: {
     request: () => {},
     success: () => {},
     fail: () => {},
   },
-  idAttribute,
+  idPath,
 })
 
 describe('fecth', () => {

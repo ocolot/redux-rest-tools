@@ -1,12 +1,14 @@
 // @flow
 import { Map, List, fromJS } from 'immutable'
 
-export default function normalize(data: {}|[{}], idAttribute: string|() => string) {
+import { get } from './helpers'
+
+export default function normalize(data: {}|[{}], idPath: IdPathType) {
   return (Array.isArray(data) ? data : [data]).reduce((normalized, d) => {
-    const id = typeof idAttribute === 'function' ? idAttribute(d) : d[idAttribute]
+    const key = get(d, idPath)
     return normalized
-      .setIn(['entities', id], fromJS(d))
-      .update('result', l => l.push(id))
+      .setIn(['entities', key], fromJS(d))
+      .update('result', l => l.push(key))
   }, Map({
     entities: Map(),
     result: List(),

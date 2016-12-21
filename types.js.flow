@@ -1,3 +1,5 @@
+import type { Map } from 'immutable'
+
 declare class ActionType {
   type: string,
   payload?: any,
@@ -22,3 +24,6 @@ declare class RequestConfigType {
   route: string,
   data: ?any,
 }
+
+type EntityType = {}|Map<string,any>
+type IdPathType = string|[string]|(entity: ?{}) => ?string
