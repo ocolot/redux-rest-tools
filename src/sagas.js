@@ -61,6 +61,9 @@ export function* fetch(options: WatchOptionsType, action: ActionType): any {
     yield put(actions.fail(error))
     if (meta) {
       const { onFailAction, onFail } = meta
+      if (!onFail && !onFailAction) {
+        throw error
+      }
       if (onFailAction) {
         const failAction = typeof onFailAction === 'function' ?
           onFailAction(error) :
