@@ -17,6 +17,12 @@ export const createAction = (type: string) => (payload: any, meta: any) => {
   return createReduxAction(type, p => p, metaCreator)(payload)
 }
 
+/**
+ * Creates a request, success and fail actions.
+ * @param {string} collection - The name of the collection.
+ * @param {string} verb - The verb defining the request type (find, findOne, create, update, delete).
+ * @returns {RequestActions} - An object containing the request, success and fail actions.
+ */
 export const createRequestActions = (collection: string, verb: string) =>
   requestSuffixes.reduce((result, suffix) => {
     const type = createRequestType(collection, verb, suffix)
@@ -24,6 +30,9 @@ export const createRequestActions = (collection: string, verb: string) =>
     return result
   }, {})
 
+/**
+ * Creates actions specific to the reducer.
+ */
 export const createReducerActions = (collection: string) =>
   reducerSuffixes.reduce((result, suffix) => {
     const type = createReducerType(collection, suffix)

@@ -1,5 +1,7 @@
 [ignore]
-lib
+.*/lib/.*
+.*/_book/.*
+.*/node_modules/.*
 
 [include]
 
