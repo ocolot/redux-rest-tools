@@ -1,7 +1,6 @@
 // @flow
 import { takeLatest } from 'redux-saga'
 import { put, call, fork } from 'redux-saga/effects'
-import { camelizeKeys } from 'humps'
 import { Iterable, fromJS } from 'immutable'
 
 import normalize from './normalize'
@@ -14,7 +13,6 @@ type WatchOptionsType = {
   schema: {},
   requestConfig: RequestConfigType,
   immutable: ?boolean,
-  camelizeKeys: ?boolean,
   isArray: boolean,
 }
 
@@ -24,10 +22,6 @@ export function* fetch(options: WatchOptionsType, action: ActionType): any {
   const { meta } = action
   try {
     let data = yield call(api, requestConfig, action)
-
-    if (options.camelizeKeys) {
-      data = camelizeKeys(data)
-    }
 
     if (Array.isArray(data)) {
       data = normalize(data, idPath)

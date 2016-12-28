@@ -51,7 +51,6 @@
   "dependencies": {
     "axios": "^0.15.2",
     "babel-runtime": "^6.18.0",
-    "humps": "^2.0.0",
     "immutable": "^3.8.1",
     "redux-actions": "^0.12.0",
     "redux-saga": "^0.12.0"
