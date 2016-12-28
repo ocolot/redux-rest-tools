@@ -6,5 +6,6 @@
 
 [libs]
 ./types.js.flow
+./node_modules/immutable/dist/immutable.js.flow
 
 [options]

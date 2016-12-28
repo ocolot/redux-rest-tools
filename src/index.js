@@ -14,9 +14,8 @@ export {
 } from './reducers'
 
 export {
-  watchRestRequests,
-  watchRequest,
-} from './sagas'
+  middleware,
+} from './middleware'
 
 export {
   getEntities,
