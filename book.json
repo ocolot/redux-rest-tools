@@ -1,0 +1,15 @@
+{
+  "gitbook": ">=3.2.1",
+  "title": "Redux REST tools",
+  "author": "Olivier Colot",
+  "plugins": ["edit-link", "prism", "-highlight", "github"],
+  "pluginsConfig": {
+    "edit-link": {
+      "base": "https://github.com/ocolor/redux-rest-tools/tree/master",
+      "label": "Edit This Page"
+    },
+    "github": {
+      "url": "https://github.com/ocolot/redux-rest-tools/"
+    }
+  }
+}

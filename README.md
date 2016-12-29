@@ -32,6 +32,10 @@ yarn add redux-rest-tools
 
 _Coming soon..._
 
+### Documentation
+
+[See full documentation](https://ocolot.github.io/redux-rest-tools/)
+
 ### Contribution & Feedback
 
 `redux-rest-tools` is at an early stage of development. You are more than welcome to provide feedback and contribute to the development of the project.

@@ -5,5 +5,5 @@
   * [Actions](/docs/api/actions/README.md)
   * [Reducers](/docs/api/reducers/README.md)
   * [Middleware](/docs/api/middleware/README.md)
-  * [Normalize](/docs/api/normalize/README.md)
+  * [Normalizer](/docs/api/normalizer/README.md)
   * [Helpers](/docs/api/helpers/README.md)
