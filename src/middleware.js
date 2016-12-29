@@ -10,66 +10,78 @@ type RequestOptionsType = {
   actions: RequestActionsType,
   idPath: IdPathType,
   apiConfig: RequestConfigType,
-  immutable: ?boolean,
+  immutable?: boolean,
 }
 
-export function request(dispatch: Dispatch, action: ActionType, options: RequestOptionsType) {
+function handleSuccess(action: ActionType, data: any, dispatch: Dispatch<any>) {
+  const { meta } = action
+  if (meta) {
+    const { onSuccess, onSuccessAction } = meta
+    if (onSuccessAction) {
+      const successAction = typeof onSuccessAction === 'function' ?
+        onSuccessAction(data) :
+        onSuccessAction
+      dispatch(successAction)
+    }
+    if (onSuccess) {
+      onSuccess(data)
+    }
+  }
+}
+
+function handleFail(action: ActionType, error: Error, dispatch: Dispatch<any>) {
+  const { meta } = action
+  if (!meta || !meta.onFail && !meta.onFailAction) {
+    console.error(`Unhandled request error for action ${action.type}`)
+    throw error
+  }
+  if (meta) {
+    const { onFailAction, onFail } = meta
+    if (onFailAction) {
+      const failAction = typeof onFailAction === 'function' ?
+        onFailAction(error) :
+        onFailAction
+      dispatch(failAction)
+    }
+    if (onFail) {
+      onFail(error)
+    }
+  }
+}
+
+function ensureImmutability(data: any, immutable: boolean) {
+  if (immutable) {
+    if (!Iterable.isIterable(data)) {
+      return fromJS(data)
+    }
+  } else {
+    if (Iterable.isIterable(data)) {
+      return data.toJS()
+    }
+  }
+  return data
+}
+
+function normalizeIfArray(data: any, idPath: IdPathType) {
+  console.log('Array.isArray(data)');
+  console.log(Array.isArray(data));
+  return Array.isArray(data) ? normalize(data, idPath) : data
+}
+
+export function callApi(dispatch: Dispatch<any>, action: ActionType, options: RequestOptionsType) {
   if (options.immutable === undefined) { options.immutable = true }
   const { actions, immutable, idPath, apiConfig } = options
-  const { meta } = action
 
   api(apiConfig, action)
-  .then(data =>
-    // normalize if array
-    Array.isArray(data) ? normalize(data, idPath) : data
-  )
-  .then(data => {
-    // ensure data immutable or not
-    if (immutable) {
-      if (!Iterable.isIterable(data)) {
-        return fromJS(data)
-      }
-    } else {
-      if (Iterable.isIterable(data)) {
-        return data.toJS()
-      }
-    }
-    return data
-  })
+  .then(data => normalizeIfArray(data, idPath))
+  .then(data => ensureImmutability(data, immutable))
   .then(data => {
     dispatch(actions.success(data))
-
-    if (meta) {
-      const { onSuccess, onSuccessAction } = meta
-      if (onSuccessAction) {
-        const successAction = typeof onSuccessAction === 'function' ?
-          onSuccessAction(data) :
-          onSuccessAction
-        dispatch(successAction)
-      }
-      if (onSuccess) {
-        onSuccess(data)
-      }
-    }
+    handleSuccess(action, data, dispatch)
   })
   .catch(error => {
     dispatch(actions.fail(error))
-    if (!meta || !meta.onFail && !meta.onFailAction) {
-      console.error(`Unhandled request error for action ${action.type}`)
-      throw error
-    }
-    if (meta) {
-      const { onFailAction, onFail } = meta
-      if (onFailAction) {
-        const failAction = typeof onFailAction === 'function' ?
-          onFailAction(error) :
-          onFailAction
-        dispatch(failAction)
-      }
-      if (onFail) {
-        onFail(error)
-      }
-    }
+    handleFail(action, error, dispatch)
   })
 }
 
@@ -81,11 +93,13 @@ export function computeIdPathString(idPath: IdPathType) {
   } else if (Array.isArray(idPath)) {
     return idPath.join('.')
   }
-  throw new Error('idPath should be a string, an array of string or a function')
 }
 
 export function computeApiConfig(baseRoute: string, verb: string, idPath: IdPathType) {
   const idPathString = computeIdPathString(idPath)
+  if (!idPathString) {
+    throw new Error('idPath should be a string, an array of string or a function')
+  }
 
   let method = 'get'
   let route = baseRoute
@@ -116,7 +130,7 @@ type RestOptionsType = {
   immutable?: boolean,
 }
 
-export function middleware(options: RestOptionsType) {
+export function middleware(options: RestOptionsType): Middleware<any, any> {
   const errorContext = 'in REST middleware configuration'
   for (const key of ['actions', 'idPath', 'baseRoute']) {
     if (!options[key]) {
@@ -154,7 +168,7 @@ export function middleware(options: RestOptionsType) {
     }
 
     handlers[requestType] = (dispatch, action) =>
-      request(dispatch, action, requestConfig)
+      callApi(dispatch, action, requestConfig)
   }
 
   return store => next => action => {
