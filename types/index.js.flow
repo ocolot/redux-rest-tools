@@ -13,7 +13,7 @@ declare class ActionType {
 
 declare function ActionCreatorType(): ActionType
 
-declare class RequestActionsType {
+type RequestActions = {
   request: ActionCreatorType,
   success: ActionCreatorType,
   fail: ActionCreatorType,
@@ -26,4 +26,4 @@ declare class RequestConfigType {
 }
 
 type EntityType = {}|Map<string,any>
-type IdPathType = string|[string]|(entity: ?{}) => ?string
+type IdPath = string|[string]|(entity: ?{}) => ?string

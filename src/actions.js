@@ -18,20 +18,23 @@ export const createAction = (type: string) => (payload: any, meta: any) => {
 }
 
 /**
- * Creates a request, success and fail actions.
+ * Creates request, success and fail action creators to handle the REST request for that collection and verb.
  * @param {string} collection - The name of the collection.
  * @param {string} verb - The verb defining the request type (find, findOne, create, update, delete).
- * @returns {RequestActions} - An object containing the request, success and fail actions.
+ * @returns {RequestActions} - An object containing the request, success and fail action creators.
  */
-export const createRequestActions = (collection: string, verb: string) =>
+export const createRequestActions = (collection: string, verb: string): RequestActions =>
   requestSuffixes.reduce((result, suffix) => {
     const type = createRequestType(collection, verb, suffix)
     result[suffix] = createAction(type)
     return result
   }, {})
 
+
 /**
- * Creates actions specific to the reducer.
+ * Creates clear and clearErrors action creators to alter portion of the state relative to the collection.
+ * @param  {string} collection - The name of the collection.
+ * @return {object}            - And object containing the clear and clearErrors action creators.
  */
 export const createReducerActions = (collection: string) =>
   reducerSuffixes.reduce((result, suffix) => {
@@ -45,6 +48,11 @@ type RestActionsConfig = {
   verbs: [string],
 }
 
+/**
+ * Creates REST action creators (request, success and fail) for each verb of that collection and to manage that portion of the state.
+ * @param  {object} config - The configuration object, `{ collection: string, verbs: [string] }`, where the `collection` key is the name of the collection and the verbs is an array of verb (`find`, `findOne`, `create`, `update` or `delete`) for which the REST actions will be generated.
+ * @return {object}        - An object containing the REST action creators corresponding to each verb and the reducer action creators.
+ */
 export function createRestActions(config: RestActionsConfig) {
   const { collection, verbs } = config
   const actions = {}

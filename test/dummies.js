@@ -1,3 +1,4 @@
+// @flow
 export const black = { name: 'black', type: 'grumpy' }
 export const white = { name: 'white', type: 'happy' }
 export const red = { name: 'red', type: 'dizzy' }

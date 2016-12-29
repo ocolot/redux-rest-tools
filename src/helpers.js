@@ -15,6 +15,12 @@ const getEntitiesOptionsDefault = {
   immutable: true,
 }
 
+/**
+ * Gets the entities from the state.
+ * @param  {object} reducerSubState - the part of the state handled by the REST reducer.
+ * @param  {object} options - the options may contain: `immutable` (boolean, defaults to true) to define if JS (requires a `toJS` conversion) or immutable objects (better for performance) should be returned; `reverse` (boolean, defaults to false) to return the objects in reverse order.
+ * @return {oject} The entities from the state (immutable list or JS array depending on the configuration).
+ */
 export function getEntities(reducerSubState: ReducerSubStateType, options: GetEntitiesOptionsType = getEntitiesOptionsDefault) {
   options = { ...getEntitiesOptionsDefault, ...options }
   const { immutable } = options
@@ -37,6 +43,13 @@ const getEntityOptionsDefault = {
   immutable: true,
 }
 
+/**
+ * Gets an entity from the state.
+ * @param  {object} reducerSubState - the part of the state handled by the REST reducer.
+ * @param  {string} key - the key of the entity to retrieve (the value returned by the specified `idPath`).
+ * @param  {object} options - the options to use. `immutable`: boolean to specify if the returned object should be immutable (defaults to true).
+ * @return {object} The entity (immutable map or JS array depending on the configuration).
+ */
 export function getEntity(reducerSubState: ReducerSubStateType, key: string, options: GetEntityOptionsType = getEntityOptionsDefault) {
   options = { ...getEntityOptionsDefault, ...options }
   if (!reducerSubState) { return }
@@ -45,6 +58,14 @@ export function getEntity(reducerSubState: ReducerSubStateType, key: string, opt
 }
 
 let statuses
+
+/**
+ * Gets the status of the request.
+ * @param  {object} reducerSubState - the part of the state handled by the REST reducer.
+ * @param  {string} status - one of `finding`, `findingOne`, `creating`, `updating` or `deleting`.
+ * @param  {string} key (optional) - the key of the entity (the value returned by the specified `idPath`).
+ * @return {boolean} `true` if the request is pending, else `false`.
+ */
 export function getStatus(reducerSubState: ReducerSubStateType, status: string, key: ?string) {
   if (!statuses) { statuses = initialState.get('ui').keySeq() }
   if (!reducerSubState) { return }
@@ -57,7 +78,7 @@ export function getStatus(reducerSubState: ReducerSubStateType, status: string, 
   return reducerSubState.getIn(path)
 }
 
-export function get(obj: EntityType, path: IdPathType) {
+export function get(obj: EntityType, path: IdPath) {
   if (!obj) { return }
 
   if (typeof path === 'string' || Array.isArray(path)) {

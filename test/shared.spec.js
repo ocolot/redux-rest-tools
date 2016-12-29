@@ -1,3 +1,4 @@
+// @flow
 import expect from 'expect'
 
 import { reducerSuffixes, requestSuffixes, restVerbs } from '../src/shared'

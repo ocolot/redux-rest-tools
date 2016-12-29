@@ -9,10 +9,16 @@
     "prepublish": "yarn run clean && yarn run build",
     "test": "NODE_ENV=test mocha --compilers js:babel-register --require babel-polyfill --recursive --check-leaks --growl",
     "test:watch": "yarn test -- --watch",
+    "jsdoc:actions": "cd docs/api/actions && documentation readme ../../../src/actions.js --section=API",
+    "jsdoc:helpers": "cd docs/api/helpers && documentation readme ../../../src/helpers.js --section=API",
+    "jsdoc:middleware": "cd docs/api/middleware && documentation readme ../../../src/middleware.js --section=API",
+    "jsdoc:normalize": "cd docs/api/normalizer && documentation readme ../../../src/normalize.js --section=API",
+    "jsdoc:reducers": "cd docs/api/reducers && documentation readme ../../../src/reducers.js --section=API",
+    "jsdoc:all": "yarn run jsdoc:actions && yarn run jsdoc:helpers && yarn run jsdoc:middleware && yarn run jsdoc:normalize && yarn run jsdoc:reducers",
     "docs:clean": "rimraf _book",
     "docs:prepare": "gitbook install",
-    "docs:build": "yarn run docs:prepare && gitbook build -g ocolot/redux-rest-tools",
-    "docs:watch": "yarn run docs:prepare && gitbook serve",
+    "docs:build": "yarn run jsdoc:all && yarn run docs:prepare && gitbook build -g ocolot/redux-rest-tools",
+    "docs:serve": "yarn run jsdoc:all && yarn run docs:prepare && gitbook serve",
     "docs:publish": "yarn run docs:clean && yarn run docs:build && cd _book && git init && git commit --allow-empty -m 'update book' && git checkout -b gh-pages && touch .nojekyll && git add . && git commit -am 'update book' && git push git@github.com:ocolot/redux-rest-tools gh-pages --force"
   },
   "repository": {
@@ -42,6 +48,7 @@
     "babel-plugin-transform-runtime": "^6.15.0",
     "babel-preset-latest": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
+    "documentation": "^4.0.0-beta.17",
     "eslint-plugin-flowtype": "^2.29.1",
     "expect": "^1.20.2",
     "gitbook-cli": "^2.3.0",
@@ -51,8 +58,10 @@
   "dependencies": {
     "axios": "^0.15.2",
     "babel-runtime": "^6.18.0",
+    "gitbook-plugin-edit-link": "2.0.2",
+    "gitbook-plugin-github": "2.0.0",
+    "gitbook-plugin-prism": "2.0.1",
     "immutable": "^3.8.1",
-    "redux-actions": "^0.12.0",
-    "redux-saga": "^0.12.0"
+    "redux-actions": "^0.12.0"
   }
 }

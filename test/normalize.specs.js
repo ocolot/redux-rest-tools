@@ -1,3 +1,4 @@
+// @flow
 import expect from 'expect'
 
 import normalize from '../src/normalize'

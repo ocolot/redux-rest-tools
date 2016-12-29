@@ -17,7 +17,7 @@ export const initialState = fromJS({
   },
 })
 
-export function getIdFromPayloadKey(action: ActionType, idPath: IdPathType) {
+export function getIdFromPayloadKey(action: ActionType, idPath: IdPath) {
   const { payload } = action
   if (!payload) { throw new Error(`Action ${action.type} should include payload key`) }
 
@@ -36,7 +36,7 @@ export function getEntity({ type, payload }: ActionType) {
   return ensureImmutable(payload)
 }
 
-export function getEntityId(entity: Map<string, any>, idPath: IdPathType, type: string) {
+export function getEntityId(entity: Map<string, any>, idPath: IdPath, type: string) {
   const id = get(entity, idPath)
   if (!id) { throw new Error(`${type} payload should include idPath`) }
   return id
@@ -160,7 +160,14 @@ export const reducerHandlers = {
 
 export const reducerSuffixes = Object.keys(reducerHandlers)
 
-export function handlerCreator(verb: string, requestActions: RequestActionsType, idPath: IdPathType) {
+/**
+ * Creates the handler function to handle the REST request actions (request, success, fail).
+ * @param  {string} verb - The verb to handle (find, findOne, create, update or delete).
+ * @param  {RequestActions} requestActions - An object containing the request, success and fail action creators to handle.
+ * @param  {IdPath} idPath - The path to the value to identify the REST entities (string, string array, function or string with dot separation).
+ * @return {object} - An object containing the functions to handle request, success and fail state change in the reducer.
+ */
+export function handlerCreator(verb: string, requestActions: RequestActions, idPath: IdPath) {
   const handler = verbHandlers[verb]
 
   if (!handler) { throw new Error(`${verb} handler not found`) }
@@ -180,19 +187,24 @@ export function handlerCreator(verb: string, requestActions: RequestActionsType,
 }
 
 type RestReducerConfigType = {
-  idPath: IdPathType,
+  idPath: IdPath,
   actions: {
-    find?: RequestActionsType,
-    findOne?: RequestActionsType,
-    create?: RequestActionsType,
-    update?: RequestActionsType,
-    delete?: RequestActionsType,
+    find?: RequestActions,
+    findOne?: RequestActions,
+    create?: RequestActions,
+    update?: RequestActions,
+    delete?: RequestActions,
     clear?: () => ActionType,
     clearErrors?: () => ActionType,
   },
   extraHandlers?: {},
 }
 
+/**
+ * Creates a REST reducer to handle the defined actions.
+ * @param  {object} config - The REST reducer config with the following keys: `idPath`, the path to the identifier of the requested objects (string, array of string or function); `actions`: the REST actions to handle; `extraHandlers`: an object where each key is the action type to handle and each key contains a function to handle the state change for these actions.
+ * @return {Reducer} - A reducer to handle REST requests state changes.
+ */
 export function restReducer(config: RestReducerConfigType) {
   const { actions, idPath, extraHandlers } = config
   if (!actions) { throw new Error('actions is required in restReducer config') }
