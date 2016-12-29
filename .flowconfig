@@ -1,6 +1,10 @@
 [ignore]
 .*/lib/.*
 .*/_book/.*
+.*/node_modules/config-chain/test/.*
+.*/node_modules/npm/node_modules/read-package-tree/test/.*
+.*/node_modules/npm/test/fixtures/config/.*
+.*/node_modules/npmi/node_modules/npm/test/.*
 
 [include]
 
