@@ -1,9 +1,7 @@
 // @flow
 
 export {
-  createRequestType,
   createRequestActions,
-  createReducerType,
   createReducerActions,
   createRestActions,
 } from './actions'

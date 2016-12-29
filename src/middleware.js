@@ -7,8 +7,8 @@ import { restVerbs } from './reducers'
 import { requestSuffixes } from './shared'
 
 type RequestOptionsType = {
-  actions: RequestActionsType,
-  idPath: IdPathType,
+  actions: RequestActions,
+  idPath: IdPath,
   apiConfig: RequestConfigType,
   immutable?: boolean,
 }
@@ -62,7 +62,7 @@ function ensureImmutability(data: any, immutable: boolean) {
   return data
 }
 
-function normalizeIfArray(data: any, idPath: IdPathType) {
+function normalizeIfArray(data: any, idPath: IdPath) {
   console.log('Array.isArray(data)');
   console.log(Array.isArray(data));
   return Array.isArray(data) ? normalize(data, idPath) : data
@@ -85,7 +85,7 @@ export function callApi(dispatch: Dispatch<any>, action: ActionType, options: Re
   })
 }
 
-export function computeIdPathString(idPath: IdPathType) {
+export function computeIdPathString(idPath: IdPath) {
   if (typeof idPath === 'string') {
     return idPath
   } else if (typeof idPath === 'function') {
@@ -95,7 +95,7 @@ export function computeIdPathString(idPath: IdPathType) {
   }
 }
 
-export function computeApiConfig(baseRoute: string, verb: string, idPath: IdPathType) {
+export function computeApiConfig(baseRoute: string, verb: string, idPath: IdPath) {
   const idPathString = computeIdPathString(idPath)
   if (!idPathString) {
     throw new Error('idPath should be a string, an array of string or a function')
@@ -124,12 +124,17 @@ export function computeApiConfig(baseRoute: string, verb: string, idPath: IdPath
 }
 
 type RestOptionsType = {
-  actions: RequestActionsType,
-  idPath: IdPathType, // NOTE: function call without parameters should return string (e.g. 'slug')
+  actions: RequestActions,
+  idPath: IdPath, // NOTE: function call without parameters should return string (e.g. 'slug')
   baseRoute: string,
   immutable?: boolean,
 }
 
+/**
+ * Creates a middleware to handle REST requests.
+ * @param  {object} options - The configuration object `{ actions: RequestActions, idPath: IdPath, baseRoute: string, immutable?: boolean}`. `actions`: and object where each key is a REST verb containing REST actions (request, succes and fail action creators) or contains REST reducer action creators. `IdPath`: the path to the REST entities identifiers (string, string array of function). `baseRoute`: the base route of the REST api (e.g. `/api/users`). `immutable`: use immutable objects as actions payload (`true` by default). E.g. with `idPath='slug'` and `baseRoute='/users'`, a call to `/users/:slug` will be made to handle the `findOne` verb.
+ * @return {Middleware} - The REST middleware to add to your store.
+ */
 export function middleware(options: RestOptionsType): Middleware<any, any> {
   const errorContext = 'in REST middleware configuration'
   for (const key of ['actions', 'idPath', 'baseRoute']) {

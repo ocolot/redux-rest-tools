@@ -160,12 +160,12 @@ describe('middleware', () => {
       expect.restoreSpies()
     })
 
-    describe('fail (data is entity, immutable is true)')
-    describe('fail (data is array, immutable is true)')
+    it('fail (data is entity, immutable is true)')
+    it('fail (data is array, immutable is true)')
 
-    describe('success (data is entity, immutable is false)')
-    describe('success (data is array, immutable is false)')
-    describe('fail (data is entity, immutable is false)')
-    describe('fail (data is array, immutable is false)')
+    it('success (data is entity, immutable is false)')
+    it('success (data is array, immutable is false)')
+    it('fail (data is entity, immutable is false)')
+    it('fail (data is array, immutable is false)')
   })
 })
