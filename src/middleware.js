@@ -63,8 +63,6 @@ function ensureImmutability(data: any, immutable: boolean) {
 }
 
 function normalizeIfArray(data: any, idPath: IdPath) {
-  console.log('Array.isArray(data)');
-  console.log(Array.isArray(data));
   return Array.isArray(data) ? normalize(data, idPath) : data
 }
 

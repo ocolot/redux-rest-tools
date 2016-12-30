@@ -25,6 +25,28 @@ Normalizes data if it is an array.
 
 Returns **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** The normalized data object with the following keys: `result`, the list of object keys (see `idPath`) and `entities`, an object with each key containing the related entity.
 
+### handlerCreator
+
+Creates the handler function to handle the REST request actions (request, success, fail).
+
+**Parameters**
+
+-   `verb` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The verb to handle (find, findOne, create, update or delete).
+-   `requestActions` **RequestActions** An object containing the request, success and fail action creators to handle.
+-   `idPath` **IdPath** The path to the value to identify the REST entities (string, string array, function or string with dot separation).
+
+Returns **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** An object containing the functions to handle request, success and fail state change in the reducer.
+
+### restReducer
+
+Creates a REST reducer to handle the defined actions.
+
+**Parameters**
+
+-   `config` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** The REST reducer config with the following keys: `idPath`, the path to the identifier of the requested objects (string, array of string or function); `actions`: the REST actions to handle; `extraHandlers`: an object where each key is the action type to handle and each key contains a function to handle the state change for these actions.
+
+Returns **Reducer** A reducer to handle REST requests state changes.
+
 ### getEntities
 
 Gets the entities from the state.
@@ -59,28 +81,6 @@ Gets the status of the request.
 -   `key` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** (optional) - the key of the entity (the value returned by the specified `idPath`).
 
 Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** `true` if the request is pending, else `false`.
-
-### handlerCreator
-
-Creates the handler function to handle the REST request actions (request, success, fail).
-
-**Parameters**
-
--   `verb` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The verb to handle (find, findOne, create, update or delete).
--   `requestActions` **RequestActions** An object containing the request, success and fail action creators to handle.
--   `idPath` **IdPath** The path to the value to identify the REST entities (string, string array, function or string with dot separation).
-
-Returns **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** An object containing the functions to handle request, success and fail state change in the reducer.
-
-### restReducer
-
-Creates a REST reducer to handle the defined actions.
-
-**Parameters**
-
--   `config` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** The REST reducer config with the following keys: `idPath`, the path to the identifier of the requested objects (string, array of string or function); `actions`: the REST actions to handle; `extraHandlers`: an object where each key is the action type to handle and each key contains a function to handle the state change for these actions.
-
-Returns **Reducer** A reducer to handle REST requests state changes.
 
 ## middleware
 
