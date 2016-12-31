@@ -16,13 +16,13 @@ The [**REST middleware**](/docs/api/middleware/README.md) handles the async requ
 
 ### Installation
 
-To install the stable version with [npm](https://www.npmjs.com/):
+To install the stable version with [npm](https://www.npmjs.com):
 
 ```
 npm install --save redux-rest-tools
 ```
 
-or with yarn:
+or with [yarn](https://yarnpkg.com):
 
 ```
 yarn add redux-rest-tools
@@ -34,7 +34,7 @@ _Coming soon..._
 
 ### Documentation
 
-[See full documentation](https://ocolot.github.io/redux-rest-tools/)
+[See full documentation](https://ocolot.github.io/redux-rest-tools)
 
 ### Contribution & Feedback
 

@@ -5,7 +5,7 @@
   "plugins": ["edit-link", "prism", "-highlight", "github"],
   "pluginsConfig": {
     "edit-link": {
-      "base": "https://github.com/ocolor/redux-rest-tools/tree/master",
+      "base": "https://github.com/ocolot/redux-rest-tools/tree/master",
       "label": "Edit This Page"
     },
     "github": {
