@@ -172,12 +172,16 @@ export function middleware(options: RestOptionsType): Middleware<any, any> {
       immutable,
     }
 
-    handlers[requestType] = (dispatch, action) => {
-      if (verb === 'find' && options.throttleFind) {
-        return throttle(callApi, options.throttleFind)(dispatch, action, requestConfig)
-      }
-      return callApi(dispatch, action, requestConfig)
+    const shouldThrottle = verb === 'find' && options.throttleFind
+    if (shouldThrottle) {
+      const throttledCallApi = throttle(callApi, options.throttleFind)
+      handlers[requestType] = (dispatch, action) =>
+        throttledCallApi(dispatch, action, requestConfig)
+    } else {
+      handlers[requestType] = (dispatch, action) =>
+        callApi(dispatch, action, requestConfig)
     }
+
   }
 
   return store => next => action => {
