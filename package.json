@@ -1,6 +1,6 @@
 {
   "name": "redux-rest-tools",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Redux tools to handle REST requests",
   "main": "lib/index.js",
   "scripts": {
@@ -52,15 +52,15 @@
     "eslint-plugin-flowtype": "^2.29.1",
     "expect": "^1.20.2",
     "gitbook-cli": "^2.3.0",
+    "gitbook-plugin-edit-link": "^2.0.2",
+    "gitbook-plugin-github": "^2.0.0",
+    "gitbook-plugin-prism": "^2.0.1",
     "mocha": "^3.1.2",
     "rimraf": "2.5.4"
   },
   "dependencies": {
     "axios": "^0.15.2",
     "babel-runtime": "^6.18.0",
-    "gitbook-plugin-edit-link": "2.0.2",
-    "gitbook-plugin-github": "2.0.0",
-    "gitbook-plugin-prism": "2.0.1",
     "immutable": "^3.8.1",
     "redux-actions": "^0.12.0"
   }
