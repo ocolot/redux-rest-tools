@@ -19,6 +19,7 @@ export {
   getEntities,
   getEntity,
   getStatus,
+  get,
 } from './helpers'
 
 export { default as normalize } from './normalize'
