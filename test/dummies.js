@@ -12,3 +12,8 @@ export const normalizedCats = {
   },
   result: [black.name, white.name, red.name],
 }
+export const findCatsActions = {
+  request: () => ({ type: 'CATS_FIND_REQUEST', payload: { name: 'black' } }),
+  success: () => ({ type: 'CATS_FIND_SUCCESS', payload: cats }),
+  fail: () => ({ type: 'CATS_FIND_FAIL' }),
+}

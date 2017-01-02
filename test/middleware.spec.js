@@ -1,12 +1,16 @@
 // @flow
 import expect from 'expect'
 import { Iterable, fromJS } from 'immutable'
-// import axios from 'axios'
+import throttle from 'lodash/throttle'
 
-import { computeIdPathString, computeApiConfig, callApi } from '../src/middleware'
+import { computeIdPathString, computeApiConfig, callApi, middleware } from '../src/middleware'
 import * as api from '../src/api'
 import * as normalize from '../src/normalize'
-// import { cats } from './dummies'
+import * as D from './dummies'
+
+const createFakeStore = fakeData => ({
+  dispatch: expect.createSpy(),
+})
 
 describe('middleware', () => {
   describe('computeIdPathString', () => {
@@ -167,5 +171,25 @@ describe('middleware', () => {
     it('success (data is array, immutable is false)')
     it('fail (data is entity, immutable is false)')
     it('fail (data is array, immutable is false)')
+  })
+
+  describe('function itself', () => {
+    it('should throw on malformed options')
+    it('should throw on malformed REST actions')
+    it('should return a middleware')
+    it('should call next(action)', () => {
+      const action = { type: 'TEST' }
+      const store = createFakeStore()
+      const next = expect.createSpy()
+      const dispatch = middleware({
+        actions: D.findCatsActions,
+        idPath: 'name',
+        baseRoute: '/cats',
+      })(store)(next)
+      dispatch(action)
+      expect(next).toHaveBeenCalledWith(action)
+    })
+    it('should handle REST api calls')
+    it('should throttle api calls')
   })
 })

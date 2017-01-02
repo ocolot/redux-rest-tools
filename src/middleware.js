@@ -1,5 +1,6 @@
 // @flow
 import { Iterable, fromJS } from 'immutable'
+import throttle from 'lodash/throttle'
 
 import normalize from './normalize'
 import api from './api'
@@ -126,11 +127,12 @@ type RestOptionsType = {
   idPath: IdPath, // NOTE: function call without parameters should return string (e.g. 'slug')
   baseRoute: string,
   immutable?: boolean,
+  throttleFind?: number,
 }
 
 /**
  * Creates a middleware to handle REST requests.
- * @param  {object} options - The configuration object `{ actions: RequestActions, idPath: IdPath, baseRoute: string, immutable?: boolean}`. `actions`: and object where each key is a REST verb containing REST actions (request, succes and fail action creators) or contains REST reducer action creators. `IdPath`: the path to the REST entities identifiers (string, string array of function). `baseRoute`: the base route of the REST api (e.g. `/api/users`). `immutable`: use immutable objects as actions payload (`true` by default). E.g. with `idPath='slug'` and `baseRoute='/users'`, a call to `/users/:slug` will be made to handle the `findOne` verb.
+ * @param  {object} options - The configuration object `{ actions: RequestActions, idPath: IdPath, baseRoute: string, immutable?: boolean}`. `actions`: and object where each key is a REST verb containing REST actions (request, succes and fail action creators) or contains REST reducer action creators. `IdPath`: the path to the REST entities identifiers (string, string array of function). `baseRoute`: the base route of the REST api (e.g. `/api/users`). `immutable`: use immutable objects as actions payload (`true` by default). `throttleFind`: wait duration (ms) to throttle find requests. E.g. with `idPath='slug'` and `baseRoute='/users'`, a call to `/users/:slug` will be made to handle the `findOne` verb.
  * @return {Middleware} - The REST middleware to add to your store.
  */
 export function middleware(options: RestOptionsType): Middleware<any, any> {
@@ -170,8 +172,12 @@ export function middleware(options: RestOptionsType): Middleware<any, any> {
       immutable,
     }
 
-    handlers[requestType] = (dispatch, action) =>
-      callApi(dispatch, action, requestConfig)
+    handlers[requestType] = (dispatch, action) => {
+      if (verb === 'find' && options.throttleFind) {
+        return throttle(callApi, options.throttleFind)(dispatch, action, requestConfig)
+      }
+      return callApi(dispatch, action, requestConfig)
+    }
   }
 
   return store => next => action => {
