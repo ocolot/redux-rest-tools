@@ -1,6 +1,5 @@
 // @flow
 import { Iterable, fromJS } from 'immutable'
-import throttle from 'lodash/throttle'
 
 import normalize from './normalize'
 import api from './api'
@@ -127,7 +126,6 @@ type RestOptionsType = {
   idPath: IdPath, // NOTE: function call without parameters should return string (e.g. 'slug')
   baseRoute: string,
   immutable?: boolean,
-  throttleFind?: number,
 }
 
 /**
@@ -142,7 +140,7 @@ export function middleware(options: RestOptionsType): Middleware<any, any> {
       throw new Error(`${key} required ${errorContext}`)
     }
   }
-  const { actions, idPath, baseRoute, immutable } = options
+  const { actions, idPath, baseRoute, immutable, composeWith } = options
 
   const verbs = Object.keys(actions)
 
@@ -172,16 +170,8 @@ export function middleware(options: RestOptionsType): Middleware<any, any> {
       immutable,
     }
 
-    const shouldThrottle = verb === 'find' && options.throttleFind
-    if (shouldThrottle) {
-      const throttledCallApi = throttle(callApi, options.throttleFind)
-      handlers[requestType] = (dispatch, action) =>
-        throttledCallApi(dispatch, action, requestConfig)
-    } else {
-      handlers[requestType] = (dispatch, action) =>
-        callApi(dispatch, action, requestConfig)
-    }
-
+    handlers[requestType] = (dispatch, action) =>
+      callApi(dispatch, action, requestConfig)
   }
 
   return store => next => action => {
