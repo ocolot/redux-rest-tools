@@ -6,25 +6,25 @@
 
 ### handlerCreator
 
-Creates the handler function to handle the REST request actions (request, success, fail).
+Creates the handler function to handle the REST request actions (request, success and fail).
 
 **Parameters**
 
 -   `verb` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The verb to handle (find, findOne, create, update or delete).
 -   `requestActions` **RequestActions** An object containing the request, success and fail action creators to handle.
--   `idPath` **IdPath** The path to the value to identify the REST entities (string, string array, function or string with dot separation).
+-   `idPath` **IdPath** The path to the value to identify the REST entities (string, string array, function or string with dot seperaing keys).
 
 Returns **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** An object containing the functions to handle request, success and fail state change in the reducer.
 
 ### restReducer
 
-Creates a REST reducer to handle the defined actions.
+Creates a REST reducer to handle the verbs of the REST action creators.
 
 **Parameters**
 
--   `config` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** The REST reducer config with the following keys: `idPath`, the path to the identifier of the requested objects (string, array of string or function); `actions`: the REST actions to handle; `extraHandlers`: an object where each key is the action type to handle and each key contains a function to handle the state change for these actions.
+-   `config` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** The REST reducer config with the following keys: `idPath`, the path to the identifier of the requested objects (string, string array, function or string with dot seperaing keys); `actions`: each key of the object is a verb (find, findOne, create, update or delete) and contains the related REST action creators (request, success and fail); `extraHandlers`: an object where each key is the action type to handle and each key contains a function to handle the state change for these actions.
 
-Returns **Reducer** A reducer to handle REST requests state changes.
+Returns **Reducer** A reducer to handle REST request actions and the extra handlers actions.
 
 ### getEntities
 
@@ -39,7 +39,7 @@ Returns **oject** The entities from the state (immutable list or JS array depend
 
 ### getEntity
 
-Gets an entity from the state.
+Gets an entity from the state based on its key.
 
 **Parameters**
 
@@ -51,15 +51,26 @@ Returns **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ### getStatus
 
-Gets the status of the request.
+Gets the status of the request by status type.
 
 **Parameters**
 
 -   `reducerSubState` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the part of the state handled by the REST reducer.
--   `status` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** one of `finding`, `findingOne`, `creating`, `updating` or `deleting`.
+-   `type` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** one of `finding`, `findingOne`, `creating`, `updating` or `deleting`.
 -   `key` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** (optional) - the key of the entity (the value returned by the specified `idPath`).
 
 Returns **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** `true` if the request is pending, else `false`.
+
+### get
+
+Gets the value within an immutable or JS object.
+
+**Parameters**
+
+-   `obj` **(Iterable | [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) \| [undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined))** the immutable or JS object. `undefined` is returned if it is not defined.
+-   `path` **([string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) | \[[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)])** the key(s) to follow. It can be a string , e.g. `'slug'`, a path in dot notation, e.g. `'profile.slug'`, or an array of strings, e.g. `['profile', 'slug']`.
+
+Returns **any** The value within the object following path, or `undefined` if it does not exist.
 
 ## handlerCreator
 

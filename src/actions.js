@@ -18,7 +18,7 @@ export const createAction = (type: string) => (payload: any, meta: any) => {
 }
 
 /**
- * Creates request, success and fail action creators to handle the REST request for that collection and verb.
+ * Creates request, success and fail action creators to handle the REST request.
  * @param {string} collection - The name of the collection.
  * @param {string} verb - The verb defining the request type (find, findOne, create, update, delete).
  * @returns {RequestActions} - An object containing the request, success and fail action creators.
@@ -32,7 +32,7 @@ export const createRequestActions = (collection: string, verb: string): RequestA
 
 
 /**
- * Creates clear and clearErrors action creators to alter portion of the state relative to the collection.
+ * Creates action creators to manage the state slice of the collection (e.g. clear to clear entities, clearErrors to clear errors, etc.).
  * @param  {string} collection - The name of the collection.
  * @return {object}            - And object containing the clear and clearErrors action creators.
  */
@@ -49,7 +49,7 @@ type RestActionsConfig = {
 }
 
 /**
- * Creates REST action creators (request, success and fail) for each verb of that collection and to manage that portion of the state.
+ * Creates REST action creators (request, success and fail) for each verb of that collection and action creators to manage the state slice of the collection.
  * @param  {object} config - The configuration object, `{ collection: string, verbs: [string] }`, where the `collection` key is the name of the collection and the verbs is an array of verb (`find`, `findOne`, `create`, `update` or `delete`) for which the REST actions will be generated.
  * @return {object}        - An object containing the REST action creators corresponding to each verb and the reducer action creators.
  */

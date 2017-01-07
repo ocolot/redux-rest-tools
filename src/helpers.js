@@ -44,7 +44,7 @@ const getEntityOptionsDefault = {
 }
 
 /**
- * Gets an entity from the state.
+ * Gets an entity from the state based on its key.
  * @param  {object} reducerSubState - the part of the state handled by the REST reducer.
  * @param  {string} key - the key of the entity to retrieve (the value returned by the specified `idPath`).
  * @param  {object} options - the options to use. `immutable`: boolean to specify if the returned object should be immutable (defaults to true).
@@ -57,28 +57,34 @@ export function getEntity(reducerSubState: ReducerSubStateType, key: string, opt
   return entity ? (options.immutable ? entity : entity.toJS()) : undefined
 }
 
-let statuses
+let types
 
 /**
- * Gets the status of the request.
+ * Gets the status of the request by status type.
  * @param  {object} reducerSubState - the part of the state handled by the REST reducer.
- * @param  {string} status - one of `finding`, `findingOne`, `creating`, `updating` or `deleting`.
+ * @param  {string} type - one of `finding`, `findingOne`, `creating`, `updating` or `deleting`.
  * @param  {string} key (optional) - the key of the entity (the value returned by the specified `idPath`).
  * @return {boolean} `true` if the request is pending, else `false`.
  */
-export function getStatus(reducerSubState: ReducerSubStateType, status: string, key: ?string) {
-  if (!statuses) { statuses = initialState.get('ui').keySeq() }
+export function getStatus(reducerSubState: ReducerSubStateType, type: string, key: ?string) {
+  if (!types) { types = initialState.get('ui').keySeq() }
   if (!reducerSubState) { return }
-  if (!statuses.includes(status)) {
-    const allowedStatus = statuses.join(', ')
+  if (!types.includes(type)) {
+    const allowedStatus = types.join(', ')
     throw new Error(`In getStatus, status should be one of ${allowedStatus}`)
   }
-  const path = ['ui', status]
+  const path = ['ui', type]
   if (key) { path.push(key) }
   return reducerSubState.getIn(path)
 }
 
-export function get(obj: EntityType, path: IdPath) {
+/**
+ * Gets the value within an immutable or JS object.
+ * @param  {Iterable|Object|undefined} obj - the immutable or JS object. `undefined` is returned if it is not defined.
+ * @param  {string|[string]} path - the key(s) to follow. It can be a string , e.g. `'slug'`, a path in dot notation, e.g. `'profile.slug'`, or an array of strings, e.g. `['profile', 'slug']`.
+ * @return {any}      The value within the object following path, or `undefined` if it does not exist.
+ */
+export function get(obj: ?EntityType, path: IdPath) {
   if (!obj) { return }
 
   if (typeof path === 'string' || Array.isArray(path)) {

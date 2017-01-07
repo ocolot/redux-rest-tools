@@ -161,10 +161,10 @@ export const reducerHandlers = {
 export const reducerSuffixes = Object.keys(reducerHandlers)
 
 /**
- * Creates the handler function to handle the REST request actions (request, success, fail).
+ * Creates the handler function to handle the REST request actions (request, success and fail).
  * @param  {string} verb - The verb to handle (find, findOne, create, update or delete).
  * @param  {RequestActions} requestActions - An object containing the request, success and fail action creators to handle.
- * @param  {IdPath} idPath - The path to the value to identify the REST entities (string, string array, function or string with dot separation).
+ * @param  {IdPath} idPath - The path to the value to identify the REST entities (string, string array, function or string with dot seperaing keys).
  * @return {object} - An object containing the functions to handle request, success and fail state change in the reducer.
  */
 export function handlerCreator(verb: string, requestActions: RequestActions, idPath: IdPath) {
@@ -201,9 +201,9 @@ type RestReducerConfigType = {
 }
 
 /**
- * Creates a REST reducer to handle the defined actions.
- * @param  {object} config - The REST reducer config with the following keys: `idPath`, the path to the identifier of the requested objects (string, array of string or function); `actions`: the REST actions to handle; `extraHandlers`: an object where each key is the action type to handle and each key contains a function to handle the state change for these actions.
- * @return {Reducer} - A reducer to handle REST requests state changes.
+ * Creates a REST reducer to handle the verbs of the REST action creators.
+ * @param  {object} config - The REST reducer config with the following keys: `idPath`, the path to the identifier of the requested objects (string, string array, function or string with dot seperaing keys); `actions`: each key of the object is a verb (find, findOne, create, update or delete) and contains the related REST action creators (request, success and fail); `extraHandlers`: an object where each key is the action type to handle and each key contains a function to handle the state change for these actions.
+ * @return {Reducer} - A reducer to handle REST request actions and the extra handlers actions.
  */
 export function restReducer(config: RestReducerConfigType) {
   const { actions, idPath, extraHandlers } = config
