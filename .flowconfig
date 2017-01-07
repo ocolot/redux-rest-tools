@@ -5,6 +5,7 @@
 .*/node_modules/npm/node_modules/read-package-tree/test/.*
 .*/node_modules/npm/test/fixtures/config/.*
 .*/node_modules/npmi/node_modules/npm/test/.*
+.*/node_modules/conventional-changelog-core/test/.*
 
 [include]
 

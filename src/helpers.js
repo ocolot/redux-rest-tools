@@ -4,8 +4,8 @@ import { Map, List, Iterable } from 'immutable'
 import { initialState } from './reducers'
 
 type GetEntitiesOptionsType = {
-  reverse: ?bool,
-  immutable: ?bool,
+  reverse?: boolean,
+  immutable?: boolean,
 }
 
 type ReducerSubStateType = ?Map<string,any>

@@ -85,6 +85,7 @@ describe('middleware', () => {
       const data = { test: 'data' }
       const options = {
         actions: {
+          request: expect.createSpy().andCall(data => data),
           success: expect.createSpy().andCall(data => data),
           fail: expect.createSpy().andCall(data => data),
         },
@@ -134,6 +135,7 @@ describe('middleware', () => {
       }
       const options = {
         actions: {
+          request: expect.createSpy().andCall(data => data),
           success: expect.createSpy().andCall(data => data),
           fail: expect.createSpy().andCall(data => data),
         },

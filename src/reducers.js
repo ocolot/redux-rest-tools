@@ -225,8 +225,9 @@ export function restReducer(config: RestReducerConfigType) {
 
   // reducer handlers
   for(const key of reducerSuffixes) {
-    if (actions[key] && typeof actions[key] === 'function') {
-      const { type } = actions[key]()
+    const action = actions[key]
+    if (action && typeof action === 'function') {
+      const { type } = action()
       handlers[type] = reducerHandlers[key]
     }
   }

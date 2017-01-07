@@ -140,7 +140,7 @@ export function middleware(options: RestOptionsType): Middleware<any, any> {
       throw new Error(`${key} required ${errorContext}`)
     }
   }
-  const { actions, idPath, baseRoute, immutable, composeWith } = options
+  const { actions, idPath, baseRoute, immutable } = options
 
   const verbs = Object.keys(actions)
 

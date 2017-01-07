@@ -19,10 +19,10 @@ type RequestActions = {
   fail: ActionCreatorType,
 }
 
-declare class RequestConfigType {
+type RequestConfigType = {
   method: 'get'|'post'|'put'|'patch'|'delete',
   route: string,
-  data: ?any,
+  data?: any,
 }
 
 type EntityType = {}|Map<string,any>
