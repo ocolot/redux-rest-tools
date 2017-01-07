@@ -1,8 +1,6 @@
-import type { Map } from 'immutable'
-
-declare class ActionType {
+declare type ActionType = {
   type: string,
-  payload?: any,
+  payload?: {}|Map<string, any>,
   meta?: {
     onSuccess?: () => void,
     onSuccessAction?: {}|ActionType,
@@ -11,19 +9,19 @@ declare class ActionType {
   },
 }
 
-declare function ActionCreatorType(): ActionType
+declare type ActionCreatorType = () => ActionType
 
-type RequestActions = {
+declare type RequestActions = {
   request: ActionCreatorType,
   success: ActionCreatorType,
   fail: ActionCreatorType,
 }
 
-type RequestConfigType = {
+declare type RequestConfigType = {
   method: 'get'|'post'|'put'|'patch'|'delete',
   route: string,
   data?: any,
 }
 
-type EntityType = {}|Map<string,any>
-type IdPath = string|[string]|(entity: ?{}) => ?string
+declare type EntityType = {}|Map<string,any>
+declare type IdPath = string|[string]|(entity: ?{}) => ?string

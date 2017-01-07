@@ -31,7 +31,7 @@ describe('restReducer', () => {
 
   describe('getIdFromPayloadKey', () => {
     it('should return idPath from payload (idPath: string)', () => {
-      const action = { payload: { name: 'black' } }
+      const action = { type: 'TEST', payload: { name: 'black' } }
       expect(getIdFromPayloadKey(action, 'name')).toBe('black')
     })
 

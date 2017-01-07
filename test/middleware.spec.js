@@ -80,7 +80,7 @@ describe('middleware', () => {
           onSuccess: expect.createSpy(),
         },
       }
-      const apiConfig = { call: 'test' }
+      const apiConfig = { method: 'get', route: '/tests' }
       const idPath = 'id'
       const data = { test: 'data' }
       const options = {

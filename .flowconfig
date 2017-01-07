@@ -10,8 +10,8 @@
 [include]
 
 [libs]
-./types/index.js.flow
-./types/redux.js.flow
 ./node_modules/immutable/dist/immutable.js.flow
+./types/redux.js.flow
+./types/index.js.flow
 
 [options]
