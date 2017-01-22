@@ -1,0 +1,23 @@
+{
+  "name": "async",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "react-scripts": "^0.6.0"
+  },
+  "dependencies": {
+    "immutable": "^3.8.1",
+    "lodash": "^4.17.4",
+    "react": "^15.3.0",
+    "react-dom": "^15.3.0",
+    "react-redux": "^4.4.5",
+    "redux": "^3.5.2",
+    "redux-immutable": "^3.0.10",
+    "redux-rest-tools": "^0.7.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject"
+  }
+}
