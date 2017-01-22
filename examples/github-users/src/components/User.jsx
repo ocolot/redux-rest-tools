@@ -1,6 +1,6 @@
 import React from 'react'
 
-const User = ({ user }) =>
+const User = ({ user, findOne }) =>
   <div style={{ marginBottom: 10 }}>
     <img
       src={user.get('avatar_url')}
@@ -13,6 +13,12 @@ const User = ({ user }) =>
     >
       {user.get('login')}
     </a>
+    <button
+      onClick={() => findOne(user.get('login'))}
+      style={{ marginLeft: 10 }}
+    >
+      Fecth user (findOne example)
+    </button>
   </div>
 
 export default User

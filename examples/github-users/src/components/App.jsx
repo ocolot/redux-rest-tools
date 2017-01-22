@@ -19,7 +19,9 @@ const App = ({ find }) =>
     <button
       onClick={() => find()}
       style={{ marginBottom: 20 }}
-    >Find users</button>
+    >
+      Fetch users (find example)
+    </button>
     <Users />
   </div>
 

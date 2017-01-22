@@ -1,5 +1,5 @@
 /*
-  Create a profile reducer to handle Github users.
+  Create reducer to handle Github users.
   It spawns based on the REST verbs found in actions (e.g. find, findOne).
 */
 import { combineReducers } from 'redux-immutable' // the whole state is an immutable object
