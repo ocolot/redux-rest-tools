@@ -89,7 +89,7 @@ Note that we use a fully immutable state in the above (that is why we use `combi
 
 ### Examples
 
-- [`github-users`](https://github.com/ocolot/redux-rest-tools/examples/github-users)
+- [`github-users`](https://github.com/ocolot/redux-rest-tools/tree/master/examples/github-users)
 
 
 
