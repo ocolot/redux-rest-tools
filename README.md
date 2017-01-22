@@ -4,6 +4,8 @@
 [![npm version](https://img.shields.io/npm/v/redux-rest-tools.svg)](https://www.npmjs.com/package/redux-rest-tools)
 [![downloads per month](https://img.shields.io/npm/dm/redux-rest-tools.svg)](https://www.npmjs.com/package/redux-rest-tools)
 
+[See full documentation](https://ocolot.github.io/redux-rest-tools)
+
 Redux REST tools is an opinionated library to handle API calls in [Redux](http://redux.js.org) apps. It provides action creators, reducers generator, state normalization and a middleware to handle the request flow... with the [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) convention in mind. It is meant to ease HTTP requests and data handling while ensuring performance and state consistency.
 
 [**REST action creators**](/docs/api/actions/README.md) use [`redux-actions`](https://github.com/acdlite/redux-actions) under the hood to create [FSA-complient](https://github.com/acdlite/flux-standard-action) set of actions. For each request, a `request`, `success` and `fail` action creator will be generate with the possibility to pass success/failure handlers to deal with the consequences of a successful/failed API request.
