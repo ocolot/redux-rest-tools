@@ -30,7 +30,68 @@ yarn add redux-rest-tools
 
 ### Usage
 
-_Coming soon..._
+Generate the actions, reducer and middleware to handle an API returning a collection of users:
+```javascript
+import { createRestActions, restReducer, middleware } from 'redux-rest-tools'
+
+// To create REST actions:
+const usersActions = createRestActions({
+  collection: 'users', // the name of the collection
+  verbs: ['find', 'findOne', 'create', 'update', 'delete'], // put the verbs you need
+})
+
+// To create the REST reducer:
+const usersReducer = restReducer({
+  idPath: 'id', // the unique identifier used for each object
+  actions: usersActions, // the reducer will handle the verbs present in usersActions
+})
+
+// To create the REST middleware:
+const usersMiddleware = middleware({
+  baseRoute: '/api/users', // the REST API endpoint
+  idPath: 'id', // e.g. findOne route will look like /api/users/:id
+  actions: usersActions, // the middleware will handle the verbs present in usersActions
+})
+```
+
+Here's one way to use them in a React app:
+```javascript
+import React from 'react'
+import { render } from 'react-dom'
+import { createStore, applyMiddleware } from 'redux'
+import { Provider } from 'react-redux'
+import { combineReducers } from 'redux-immutable'
+
+import App from './containers/App' // your root React component
+
+const rootReducer = combineReducers({
+  usersReducer,
+  // ... add other reducers here
+})
+
+const store = createStore(
+  rootReducer,
+  applyMiddleware(
+    usersMiddleware
+    // ... add other middlewares here
+  )
+)
+
+render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+)
+```
+
+Note that we use a fully immutable state in the above (that is why we use `combineReducers` from [`redux-immutable`](https://github.com/gajus/redux-immutable)). If you wish to use `redux-rest-tools` within a non immutable state, you may simply use Redux's version of [`combineReducers`](http://redux.js.org/docs/api/combineReducers.html) (the state slice(s) managed by `redux-rest-tools` will remain immutable, see the [helpers documentation](https://ocolot.github.io/redux-rest-tools/docs/api/helpers/) to retrieve JS objects instead of immutable ones).
+
+### Examples
+
+- [`github-users`](https://github.com/ocolot/redux-rest-tools/examples/github-users)
+
+
 
 ### Documentation
 
