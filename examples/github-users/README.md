@@ -1,6 +1,8 @@
-**This example is based on the '[real-world](https://github.com/reactjs/redux/tree/master/examples/real-world)' example from the [`redux`](https://github.com/reactjs/redux) respository. Github API handling has been adapted to use `redux-rest-tools`.**
+# Github users (example)
 
-# Redux Async Example
+This example app demonstrate how to fetch Github users with `redux-rest-tools`.
+
+_The next part of this README comes from [Redux async example](https://github.com/reactjs/redux/tree/master/examples/async), as they have the same purpose._
 
 This project template was built with [Create React App](https://github.com/facebookincubator/create-react-app).
 
