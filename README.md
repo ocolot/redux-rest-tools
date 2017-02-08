@@ -3,6 +3,11 @@
 [![build status](https://img.shields.io/travis/ocolot/redux-rest-tools.svg)](https://travis-ci.org/ocolot/redux-rest-tools)
 [![npm version](https://img.shields.io/npm/v/redux-rest-tools.svg)](https://www.npmjs.com/package/redux-rest-tools)
 [![downloads per month](https://img.shields.io/npm/dm/redux-rest-tools.svg)](https://www.npmjs.com/package/redux-rest-tools)
+[![bitHound Overall Score](https://www.bithound.io/github/ocolot/redux-rest-tools/badges/score.svg)](https://www.bithound.io/github/ocolot/redux-rest-tools)
+[![bitHound Code](https://www.bithound.io/github/ocolot/redux-rest-tools/badges/code.svg)](https://www.bithound.io/github/ocolot/redux-rest-tools)
+<!-- [![bitHound Dependencies](https://www.bithound.io/github/ocolot/redux-rest-tools/badges/dependencies.svg)](https://www.bithound.io/github/ocolot/redux-rest-tools/master/dependencies/npm)
+[![bitHound Dev Dependencies](https://www.bithound.io/github/ocolot/redux-rest-tools/badges/devDependencies.svg)](https://www.bithound.io/github/ocolot/redux-rest-tools/master/dependencies/npm) -->
+
 
 [See full documentation](https://ocolot.github.io/redux-rest-tools)
 
