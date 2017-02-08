@@ -1,0 +1,4 @@
+{
+  "plugins": ["transform-flow-strip-types", "transform-runtime"],
+  "presets": ["latest", "stage-0"]
+}

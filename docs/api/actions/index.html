@@ -1,0 +1,397 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Actions · Redux REST tools</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.2">
+        <meta name="author" content="Olivier Colot">
+        
+        
+    
+    <link rel="stylesheet" href="../../../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../../../gitbook/gitbook-plugin-prism/prism.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../../../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../../../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../../../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="../reducers/" />
+    
+    
+    <link rel="prev" href="../" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../../../">
+            
+                <a href="../../../">
+            
+                    
+                    Read Me
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    API Reference
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter active" data-level="1.2.1" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="../reducers/">
+            
+                <a href="../reducers/">
+            
+                    
+                    Reducers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="../middleware/">
+            
+                <a href="../middleware/">
+            
+                    
+                    Middleware
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.4" data-path="../normalizer/">
+            
+                <a href="../normalizer/">
+            
+                    
+                    Normalizer
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.5" data-path="../helpers/">
+            
+                <a href="../helpers/">
+            
+                    
+                    Helpers
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href="../../.." >Actions</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="rest-actions">REST Actions</h1>
+<!-- **REST action creators** use `redux-actions` under the hood to create FSA-complient set of actions (`{ type: string payload?: any, meta?: any }`). For each request, a `request`, `success` and `fail` action creator will be generate. The meta may contain `onSuccessAction`, `onSuccess`, `onFailAction`, `onFail` actions/action creators/functions to deal with the consequences of a successful/failed API request. -->
+<h2 id="api">API</h2>
+<!-- Generated by documentation.js. Update this documentation by updating the source code. -->
+<h3 id="createrequestactions">createRequestActions</h3>
+<p>Creates request, success and fail action creators to handle the REST request.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>collection</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">string</a></strong> The name of the collection.</li>
+<li><code>verb</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">string</a></strong> The verb defining the request type (find, findOne, create, update, delete).</li>
+</ul>
+<p>Returns <strong>RequestActions</strong> An object containing the request, success and fail action creators.</p>
+<h3 id="createreduceractions">createReducerActions</h3>
+<p>Creates action creators to manage the state slice of the collection (e.g. clear to clear entities, clearErrors to clear errors, etc.).</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>collection</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">string</a></strong> The name of the collection.</li>
+</ul>
+<p>Returns <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">object</a></strong> And object containing the clear and clearErrors action creators.</p>
+<h3 id="createrestactions">createRestActions</h3>
+<p>Creates REST action creators (request, success and fail) for each verb of that collection and action creators to manage the state slice of the collection.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>config</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">object</a></strong> The configuration object, <code>{ collection: string, verbs: [string] }</code>, where the <code>collection</code> key is the name of the collection and the verbs is an array of verb (<code>find</code>, <code>findOne</code>, <code>create</code>, <code>update</code> or <code>delete</code>) for which the REST actions will be generated.</li>
+</ul>
+<p>Returns <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">object</a></strong> An object containing the REST action creators corresponding to each verb and the reducer action creators.</p>
+<h3 id="handlercreator">handlerCreator</h3>
+<p>Creates the handler function to handle the REST request actions (request, success and fail).</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>verb</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">string</a></strong> The verb to handle (find, findOne, create, update or delete).</li>
+<li><code>requestActions</code> <strong>RequestActions</strong> An object containing the request, success and fail action creators to handle.</li>
+<li><code>idPath</code> <strong>IdPath</strong> The path to the value to identify the REST entities (string, string array, function or string with dot seperaing keys).</li>
+</ul>
+<p>Returns <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">object</a></strong> An object containing the functions to handle request, success and fail state change in the reducer.</p>
+<h3 id="restreducer">restReducer</h3>
+<p>Creates a REST reducer to handle the verbs of the REST action creators.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>config</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">object</a></strong> The REST reducer config with the following keys: <code>idPath</code>, the path to the identifier of the requested objects (string, string array, function or string with dot seperaing keys); <code>actions</code>: each key of the object is a verb (find, findOne, create, update or delete) and contains the related REST action creators (request, success and fail); <code>extraHandlers</code>: an object where each key is the action type to handle and each key contains a function to handle the state change for these actions.</li>
+</ul>
+<p>Returns <strong>Reducer</strong> A reducer to handle REST request actions and the extra handlers actions.</p>
+<h3 id="getentities">getEntities</h3>
+<p>Gets the entities from the state.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>reducerSubState</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">object</a></strong> the part of the state handled by the REST reducer.</li>
+<li><code>options</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">object</a>?= getEntitiesOptionsDefault</strong> the options may contain: <code>immutable</code> (boolean, defaults to true) to define if JS (requires a <code>toJS</code> conversion) or immutable objects (better for performance) should be returned; <code>reverse</code> (boolean, defaults to false) to return the objects in reverse order.</li>
+</ul>
+<p>Returns <strong>oject</strong> The entities from the state (immutable list or JS array depending on the configuration).</p>
+<h3 id="getentity">getEntity</h3>
+<p>Gets an entity from the state based on its key.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>reducerSubState</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">object</a></strong> the part of the state handled by the REST reducer.</li>
+<li><code>key</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">string</a></strong> the key of the entity to retrieve (the value returned by the specified <code>idPath</code>).</li>
+<li><code>options</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">object</a>?= getEntityOptionsDefault</strong> the options to use. <code>immutable</code>: boolean to specify if the returned object should be immutable (defaults to true).</li>
+</ul>
+<p>Returns <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">object</a></strong> The entity (immutable map or JS array depending on the configuration).</p>
+<h3 id="getstatus">getStatus</h3>
+<p>Gets the status of the request by status type.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>reducerSubState</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">object</a></strong> the part of the state handled by the REST reducer.</li>
+<li><code>type</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">string</a></strong> one of <code>finding</code>, <code>findingOne</code>, <code>creating</code>, <code>updating</code> or <code>deleting</code>.</li>
+<li><code>key</code> <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">string</a></strong> (optional) - the key of the entity (the value returned by the specified <code>idPath</code>).</li>
+</ul>
+<p>Returns <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean" target="_blank">boolean</a></strong> <code>true</code> if the request is pending, else <code>false</code>.</p>
+<h3 id="get">get</h3>
+<p>Gets the value within an immutable or JS object.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>obj</code> <strong>(Iterable | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined" target="_blank">undefined</a>)</strong> the immutable or JS object. <code>undefined</code> is returned if it is not defined.</li>
+<li><code>path</code> <strong>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">string</a> | [<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">string</a>])</strong> the key(s) to follow. It can be a string , e.g. <code>&apos;slug&apos;</code>, a path in dot notation, e.g. <code>&apos;profile.slug&apos;</code>, or an array of strings, e.g. <code>[&apos;profile&apos;, &apos;slug&apos;]</code>.</li>
+</ul>
+<p>Returns <strong>any</strong> The value within the object following path, or <code>undefined</code> if it does not exist.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="../" class="navigation navigation-prev " aria-label="Previous page: API Reference">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="../reducers/" class="navigation navigation-next " aria-label="Next page: Reducers">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Actions","level":"1.2.1","depth":2,"next":{"title":"Reducers","level":"1.2.2","depth":2,"path":"docs/api/reducers/README.md","ref":"docs/api/reducers/README.md","articles":[]},"previous":{"title":"API Reference","level":"1.2","depth":1,"path":"docs/api/README.md","ref":"docs/api/README.md","articles":[{"title":"Actions","level":"1.2.1","depth":2,"path":"docs/api/actions/README.md","ref":"docs/api/actions/README.md","articles":[]},{"title":"Reducers","level":"1.2.2","depth":2,"path":"docs/api/reducers/README.md","ref":"docs/api/reducers/README.md","articles":[]},{"title":"Middleware","level":"1.2.3","depth":2,"path":"docs/api/middleware/README.md","ref":"docs/api/middleware/README.md","articles":[]},{"title":"Normalizer","level":"1.2.4","depth":2,"path":"docs/api/normalizer/README.md","ref":"docs/api/normalizer/README.md","articles":[]},{"title":"Helpers","level":"1.2.5","depth":2,"path":"docs/api/helpers/README.md","ref":"docs/api/helpers/README.md","articles":[]}]},"dir":"ltr"},"config":{"plugins":["edit-link","prism","-highlight","github"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"edit-link":{"label":"Edit This Page","base":"https://github.com/ocolot/redux-rest-tools/tree/master"},"github":{"url":"https://github.com/ocolot/redux-rest-tools/"},"prism":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","author":"Olivier Colot","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"Redux REST tools","gitbook":">=3.2.1"},"file":{"path":"docs/api/actions/README.md","mtime":"2017-01-22T17:20:11.000Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-02-08T11:26:49.315Z"},"basePath":"../../..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../../../gitbook/gitbook.js"></script>
+    <script src="../../../gitbook/theme.js"></script>
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-edit-link/plugin.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../../../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

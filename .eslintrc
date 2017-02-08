@@ -1,0 +1,14 @@
+{
+  "parser": "babel-eslint",
+  "extends": [
+    "airbnb",
+    "plugin:flowtype/recommended"
+  ],
+  "plugins": [
+    "flowtype"
+  ],
+  "rules": {
+    "semi": "error",
+    "new-cap": [2, { "capIsNewExceptions": ["Map", "List"] }],
+  }
+}

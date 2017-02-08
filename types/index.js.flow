@@ -1,0 +1,27 @@
+declare type ActionType = {
+  type: string,
+  payload?: {}|Map<string, any>,
+  meta?: {
+    onSuccess?: () => void,
+    onSuccessAction?: {}|ActionType,
+    onFail?: () => {},
+    onFailAction?: {}|ActionType,
+  },
+}
+
+declare type ActionCreatorType = () => ActionType
+
+declare type RequestActions = {
+  request: ActionCreatorType,
+  success: ActionCreatorType,
+  fail: ActionCreatorType,
+}
+
+declare type RequestConfigType = {
+  method: 'get'|'post'|'put'|'patch'|'delete',
+  route: string,
+  data?: any,
+}
+
+declare type EntityType = {}|Map<string,any>
+declare type IdPath = string|[string]|(entity: ?{}) => ?string
